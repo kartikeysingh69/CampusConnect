@@ -19,10 +19,14 @@ export const register = (data) => API.post('/auth/register', data);
 export const login = (data) => API.post('/auth/login', data);
 
 // ---- Jobs APIs ----
-export const getJobs = () => API.get('/jobs');
+export const getJobs = (params = {}) => API.get('/jobs', { params });
+export const getAllAdminJobs = () => API.get('/jobs?all=true');
 export const getJobById = (id) => API.get(`/jobs/${id}`);
 export const createJob = (data) => API.post('/jobs', data);
+export const updateJob = (id, data) => API.put(`/jobs/${id}`, data);
 export const closeJob = (id) => API.patch(`/jobs/${id}/close`);
+export const toggleJobStatus = (id) => API.patch(`/jobs/${id}/toggle-status`);
+export const deleteJob = (id) => API.delete(`/jobs/${id}`);
 
 // ---- Applications APIs ----
 export const applyForJob = (job_id) => API.post('/applications', { job_id });
