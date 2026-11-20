@@ -1,6 +1,6 @@
-// src/pages/MyApplications.jsx — Real-time Application Tracking, Visual Timeline & Withdraw Option
+// src/pages/MyApplications.jsx — Real-time Application Tracking, Visual Timeline, Interviews & Offer Letters
 import { useState, useEffect, useMemo } from 'react';
-import { getMyApplications, withdrawApplication } from '../services/api';
+import { getMyApplications, withdrawApplication, getMyInterviews } from '../services/api';
 import CompanyLogo from '../components/CompanyLogo';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
@@ -21,7 +21,11 @@ import {
   FaMoneyBillWave,
   FaTrashAlt,
   FaInfoCircle,
-  FaArrowRight
+  FaArrowRight,
+  FaCalendarCheck,
+  FaAward,
+  FaVideo,
+  FaDownload
 } from 'react-icons/fa';
 
 const statusConfig = {
@@ -61,6 +65,7 @@ const statusConfig = {
 
 export default function MyApplications() {
   const [applications, setApplications] = useState([]);
+  const [interviews, setInterviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -69,8 +74,14 @@ export default function MyApplications() {
 
   const fetchApplications = () => {
     setLoading(true);
-    getMyApplications()
-      .then(({ data }) => setApplications(data.applications || []))
+    Promise.all([
+      getMyApplications(),
+      getMyInterviews()
+    ])
+      .then(([appsRes, ivRes]) => {
+        setApplications(appsRes.data.applications || []);
+        setInterviews(ivRes.data.interviews || []);
+      })
       .catch(() => toast.error('Failed to load applications'))
       .finally(() => setLoading(false));
   };
@@ -193,6 +204,100 @@ export default function MyApplications() {
           </div>
         ))}
       </div>
+
+      {/* Upcoming Interview Rounds & Hall Tickets */}
+      {interviews.length > 0 && (
+        <div style={{ marginBottom: '1.8rem', background: '#ffffff', border: '1.5px solid #bfdbfe', borderRadius: '16px', padding: '1.3rem', boxShadow: '0 4px 16px rgba(37, 99, 235, 0.06)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.6rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.1rem' }}>
+                <FaCalendarCheck />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a', fontWeight: 800 }}>
+                  Upcoming Interview Rounds ({interviews.length})
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                  Recruiters have scheduled your assessment rounds. Be ready on time!
+                </span>
+              </div>
+            </div>
+            <span style={{ background: '#dcfce7', color: '#166534', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.65rem', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
+              Confirmed Schedule
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+            {interviews.map((iv) => (
+              <div
+                key={iv.id}
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '12px',
+                  padding: '1.1rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '0.8rem'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
+                    <div style={{ fontWeight: 800, fontSize: '0.96rem', color: '#0f172a' }}>
+                      {iv.round_name}
+                    </div>
+                    <span style={{ background: '#e0f2fe', color: '#0369a1', fontSize: '0.72rem', padding: '0.15rem 0.5rem', borderRadius: '10px', fontWeight: 700 }}>
+                      {iv.mode}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.84rem', color: '#ea580c', fontWeight: 700, marginBottom: '0.4rem' }}>
+                    {iv.company} • {iv.job_title}
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <FaCalendarAlt style={{ color: '#94a3b8', fontSize: '0.78rem' }} />
+                    {new Date(iv.scheduled_date).toLocaleString('en-IN', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })} ({iv.duration_minutes} Mins)
+                  </div>
+                  {iv.notes && (
+                    <div style={{ fontSize: '0.76rem', color: '#64748b', fontStyle: 'italic', marginTop: '0.4rem', background: '#ffffff', padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #f1f5f9' }}>
+                      Instructions: {iv.notes}
+                    </div>
+                  )}
+                </div>
+
+                <a
+                  href={iv.location_or_link.startsWith('http') ? iv.location_or_link : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                    color: '#ffffff',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    textAlign: 'center',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.45rem',
+                    boxShadow: '0 3px 8px rgba(37, 99, 235, 0.25)'
+                  }}
+                >
+                  <FaVideo /> Join Assessment / Venue Details
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Search & Filter Toolbar */}
       <div
@@ -476,6 +581,109 @@ export default function MyApplications() {
                   )}
                 </div>
 
+                {/* Celebratory Formal Offer Letter Released Banner */}
+                {isSelected && (
+                  <div
+                    style={{
+                      background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
+                      border: '1.5px solid #86efac',
+                      borderRadius: '12px',
+                      padding: '1.1rem 1.3rem',
+                      marginBottom: '1.2rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexWrap: 'wrap',
+                      gap: '1rem',
+                      boxShadow: '0 4px 14px rgba(22, 163, 74, 0.08)'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+                      <div
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '12px',
+                          background: '#dcfce7',
+                          color: '#16a34a',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '1.35rem',
+                          boxShadow: '0 2px 6px rgba(22, 163, 74, 0.2)'
+                        }}
+                      >
+                        <FaAward />
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 800, color: '#14532d', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                          🎉 Official Placement Offer Released!
+                        </div>
+                        <div style={{ fontSize: '0.84rem', color: '#166534', marginTop: '0.2rem' }}>
+                          {app.offered_ctc && (
+                            <span>
+                              <strong>Offered CTC:</strong> {app.offered_ctc} •{' '}
+                            </span>
+                          )}
+                          {app.joining_date && (
+                            <span>
+                              <strong>Tentative Joining Date:</strong>{' '}
+                              {new Date(app.joining_date).toLocaleDateString('en-IN', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })}{' '}
+                              •{' '}
+                            </span>
+                          )}
+                          <span>Placement department congratulations on your campus selection!</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {app.offer_letter_url ? (
+                      <a
+                        href={
+                          app.offer_letter_url.startsWith('http')
+                            ? app.offer_letter_url
+                            : `http://localhost:5000${app.offer_letter_url}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                          color: '#ffffff',
+                          padding: '0.6rem 1.25rem',
+                          borderRadius: '8px',
+                          fontWeight: 700,
+                          fontSize: '0.86rem',
+                          textDecoration: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          boxShadow: '0 4px 12px rgba(22, 163, 74, 0.3)'
+                        }}
+                      >
+                        <FaDownload /> Download Formal Offer Letter
+                      </a>
+                    ) : (
+                      <span
+                        style={{
+                          background: '#dcfce7',
+                          color: '#166534',
+                          border: '1px solid #bbf7d0',
+                          padding: '0.45rem 0.9rem',
+                          borderRadius: '8px',
+                          fontSize: '0.8rem',
+                          fontWeight: 700
+                        }}
+                      >
+                        ✓ Hardcopy Dispatch In Progress
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 {/* Footer Action Bar */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem', paddingTop: '0.5rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
@@ -610,6 +818,34 @@ export default function MyApplications() {
                       >
                         {conf.label}
                       </span>
+                      {app.offer_letter_url && (
+                        <div style={{ marginTop: '0.4rem' }}>
+                          <a
+                            href={
+                              app.offer_letter_url.startsWith('http')
+                                ? app.offer_letter_url
+                                : `http://localhost:5000${app.offer_letter_url}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              background: '#dcfce7',
+                              color: '#15803d',
+                              border: '1px solid #86efac',
+                              padding: '0.2rem 0.6rem',
+                              borderRadius: '6px',
+                              fontSize: '0.72rem',
+                              fontWeight: 700,
+                              textDecoration: 'none',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.3rem'
+                            }}
+                          >
+                            <FaDownload /> Offer Letter
+                          </a>
+                        </div>
+                      )}
                     </td>
                     <td style={{ padding: '1rem' }}>
                       {app.student_resume ? (

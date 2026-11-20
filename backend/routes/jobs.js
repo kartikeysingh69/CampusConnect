@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const verifyToken = require('../middleware/auth');
+const { sendNotification } = require('./notifications');
 
 // ---- GET all jobs with optional stream filter ----
 // URL: GET http://localhost:5000/api/jobs?stream=Mechanical&all=true
@@ -71,6 +72,23 @@ router.post('/', verifyToken, async (req, res) => {
         job_type || 'Full Time'
       ]
     );
+
+    // Broadcast in-app notification to all students
+    try {
+      const [students] = await db.query("SELECT id FROM users WHERE role = 'student'");
+      for (const s of students) {
+        sendNotification({
+          userId: s.id,
+          title: `🚀 New Drive: ${company}`,
+          message: `New recruitment drive for "${title}" (${stream || 'Computer Science'}) has opened for applications!`,
+          type: 'new_job',
+          link: `/jobs/${result.insertId}`
+        });
+      }
+    } catch (notifErr) {
+      console.warn('Error broadcasting job notification:', notifErr.message);
+    }
+
     res.status(201).json({ message: '✅ Job created!', jobId: result.insertId });
   } catch (err) {
     res.status(500).json({ message: 'Error creating job', error: err.message });

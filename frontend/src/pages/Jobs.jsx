@@ -1,7 +1,9 @@
 // src/pages/Jobs.jsx — Browse placement drives with Company Logos, Multi-Stream Filters & Auto-Shuffle on refresh
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { getJobs } from '../services/api';
+import { getJobs, getProfile } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import { calculateSkillMatch } from '../utils/skillMatcher';
 import CompanyLogo from '../components/CompanyLogo';
 import toast from 'react-hot-toast';
 import {
@@ -52,7 +54,9 @@ function shuffleArray(array) {
 }
 
 export default function Jobs() {
+  const { user } = useAuth();
   const [jobs, setJobs] = useState([]);
+  const [studentProfile, setStudentProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Filters State: Multi-select stream support (array)
@@ -74,7 +78,24 @@ export default function Jobs() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+
+    // If user is a student, fetch their profile skills for AI match scoring
+    if (user && user.role === 'student') {
+      getProfile()
+        .then(({ data }) => setStudentProfile(data))
+        .catch(() => {});
+    }
+  }, [user]);
+
+  // AI Skill Match calculations for all jobs
+  const jobMatches = useMemo(() => {
+    const candidate = studentProfile || user;
+    const map = {};
+    jobs.forEach((j) => {
+      map[j.id] = calculateSkillMatch(j, candidate);
+    });
+    return map;
+  }, [jobs, studentProfile, user]);
 
   // Compute stream counts
   const streamCounts = useMemo(() => {
@@ -183,6 +204,11 @@ export default function Jobs() {
         return true;
       })
       .sort((a, b) => {
+        if (sortBy === 'match_desc') {
+          const scoreB = jobMatches[b.id]?.score || 0;
+          const scoreA = jobMatches[a.id]?.score || 0;
+          return scoreB - scoreA;
+        }
         if (sortBy === 'ctc_desc') return parseCtc(b.ctc) - parseCtc(a.ctc);
         if (sortBy === 'ctc_asc') return parseCtc(a.ctc) - parseCtc(b.ctc);
         if (sortBy === 'company_asc') return (a.company || '').localeCompare(b.company || '');
@@ -190,7 +216,7 @@ export default function Jobs() {
         if (sortBy === 'newest') return (b.id || 0) - (a.id || 0);
         return 0; // Default 'shuffle': retain randomized dynamic order!
       });
-  }, [jobs, selectedStreams, selectedJobType, selectedLocation, search, sortBy]);
+  }, [jobs, selectedStreams, selectedJobType, selectedLocation, search, sortBy, jobMatches]);
 
   if (loading) return <div className="loading">Loading placement opportunities...</div>;
 
@@ -406,6 +432,7 @@ export default function Jobs() {
               className="sidebar-select"
             >
               <option value="shuffle">🔀 Dynamic Shuffle (Auto on Refresh)</option>
+              <option value="match_desc">🎯 AI Skill Match (Highest First)</option>
               <option value="newest">Newest Drives First</option>
               <option value="ctc_desc">Highest Package (CTC: High to Low)</option>
               <option value="ctc_asc">Lowest Package (CTC: Low to High)</option>
@@ -532,9 +559,31 @@ export default function Jobs() {
                         </p>
                       </div>
                     </div>
-                    <span className="job-card-type-badge">
-                      {job.job_type || 'Full Time'}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.35rem' }}>
+                      <span className="job-card-type-badge">
+                        {job.job_type || 'Full Time'}
+                      </span>
+                      {jobMatches[job.id] && (
+                        <span
+                          style={{
+                            background: jobMatches[job.id].bg,
+                            color: jobMatches[job.id].color,
+                            border: `1px solid ${jobMatches[job.id].border}`,
+                            padding: '0.18rem 0.55rem',
+                            borderRadius: '12px',
+                            fontSize: '0.72rem',
+                            fontWeight: 800,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.25rem',
+                            whiteSpace: 'nowrap'
+                          }}
+                          title={`AI Match: ${jobMatches[job.id].score}% (${jobMatches[job.id].ratingLabel})`}
+                        >
+                          🎯 {jobMatches[job.id].score}% Match
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <h3 style={{ fontSize: '1.18rem', marginBottom: '0.4rem', color: '#0f172a' }}>

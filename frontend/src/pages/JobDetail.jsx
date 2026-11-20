@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getJobById, applyForJob, getMyApplications, getJobs, getProfile } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { calculateSkillMatch } from '../utils/skillMatcher';
 import CompanyLogo from '../components/CompanyLogo';
 import toast from 'react-hot-toast';
 import {
@@ -102,6 +103,7 @@ export default function JobDetail() {
   const { user } = useAuth();
   const [job, setJob] = useState(null);
   const [allJobs, setAllJobs] = useState([]);
+  const [studentProfile, setStudentProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
   const [hasApplied, setHasApplied] = useState(false);
@@ -122,7 +124,7 @@ export default function JobDetail() {
       .catch(() => toast.error('Failed to load job details'))
       .finally(() => setLoading(false));
 
-    // Check applied status
+    // Check applied status & fetch student profile for AI skill match
     if (user && user.role === 'student') {
       getMyApplications()
         .then(({ data }) => {
@@ -132,8 +134,18 @@ export default function JobDetail() {
           if (applied) setHasApplied(true);
         })
         .catch(() => {});
+
+      getProfile()
+        .then(({ data }) => setStudentProfile(data))
+        .catch(() => {});
     }
   }, [id, user]);
+
+  // Compute AI Skill Match Analysis
+  const skillMatch = useMemo(() => {
+    if (!job) return null;
+    return calculateSkillMatch(job, studentProfile || user);
+  }, [job, studentProfile, user]);
 
   // Recommended jobs: same stream first, then other streams, excluding current
   const { sameStreamJobs, otherJobs } = useMemo(() => {
@@ -266,6 +278,129 @@ export default function JobDetail() {
               <h3><FaGraduationCap className="section-icon" /> Eligibility Criteria</h3>
               <p>{job.eligibility || 'Open for final year students of relevant disciplines.'}</p>
             </div>
+
+            {/* AI Skill Fit & Recommendation Box */}
+            {skillMatch && (
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #fff7ed 0%, #ffffff 100%)',
+                  border: '1.5px solid #fed7aa',
+                  borderRadius: '14px',
+                  padding: '1.3rem',
+                  marginBottom: '1.8rem',
+                  boxShadow: '0 4px 14px rgba(234, 88, 12, 0.05)'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', flexWrap: 'wrap', gap: '0.6rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '1.25rem' }}>🎯</span>
+                    <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0f172a', fontWeight: 800 }}>
+                      AI Candidate Skill Match & Fit Analysis
+                    </h3>
+                  </div>
+                  <span
+                    style={{
+                      background: skillMatch.bg,
+                      color: skillMatch.color,
+                      border: `1.5px solid ${skillMatch.border}`,
+                      padding: '0.3rem 0.8rem',
+                      borderRadius: '20px',
+                      fontSize: '0.82rem',
+                      fontWeight: 800
+                    }}
+                  >
+                    {skillMatch.score}% Match • {skillMatch.ratingLabel}
+                  </span>
+                </div>
+
+                {/* Match Meter Bar */}
+                <div style={{ width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden', marginBottom: '1rem' }}>
+                  <div
+                    style={{
+                      width: `${skillMatch.score}%`,
+                      height: '100%',
+                      background:
+                        skillMatch.score >= 80
+                          ? 'linear-gradient(90deg, #10b981, #16a34a)'
+                          : skillMatch.score >= 60
+                          ? 'linear-gradient(90deg, #3b82f6, #0284c7)'
+                          : 'linear-gradient(90deg, #f59e0b, #ea580c)',
+                      borderRadius: '4px',
+                      transition: 'width 0.8s ease'
+                    }}
+                  />
+                </div>
+
+                <p style={{ fontSize: '0.88rem', color: '#475569', margin: '0 0 1rem 0' }}>
+                  {skillMatch.advice}
+                </p>
+
+                {/* Skills Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+                  {/* Matched Skills */}
+                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '0.9rem' }}>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#166534', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <FaCheckCircle style={{ color: '#16a34a' }} /> Matched Skills ({skillMatch.matchedSkills.length})
+                    </div>
+                    {skillMatch.matchedSkills.length > 0 ? (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        {skillMatch.matchedSkills.map((sk) => (
+                          <span
+                            key={sk}
+                            style={{
+                              background: '#ffffff',
+                              border: '1px solid #86efac',
+                              color: '#15803d',
+                              padding: '0.25rem 0.65rem',
+                              borderRadius: '8px',
+                              fontSize: '0.78rem',
+                              fontWeight: 700
+                            }}
+                          >
+                            ✓ {sk}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.8rem', color: '#64748b', fontStyle: 'italic' }}>
+                        No direct overlap detected with registered skills.
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Skills to Learn / Brush Up */}
+                  <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '10px', padding: '0.9rem' }}>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#92400e', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <FaLightbulb style={{ color: '#d97706' }} /> Recommended to Prepare ({skillMatch.missingSkills.length})
+                    </div>
+                    {skillMatch.missingSkills.length > 0 ? (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        {skillMatch.missingSkills.map((sk) => (
+                          <span
+                            key={sk}
+                            style={{
+                              background: '#ffffff',
+                              border: '1px solid #fcd34d',
+                              color: '#b45309',
+                              padding: '0.25rem 0.65rem',
+                              borderRadius: '8px',
+                              fontSize: '0.78rem',
+                              fontWeight: 700
+                            }}
+                          >
+                            + {sk}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: '0.8rem', color: '#15803d', fontWeight: 600 }}>
+                        All primary technical prerequisites satisfied!
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Key Highlights */}
             <div className="detail-section">

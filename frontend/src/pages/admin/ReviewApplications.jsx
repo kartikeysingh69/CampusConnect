@@ -1,6 +1,13 @@
 // src/pages/admin/ReviewApplications.jsx — Candidate Filtering, Search, Bulk Actions & CSV Export
 import { useState, useEffect, useMemo } from 'react';
-import { getAllApplications, updateApplicationStatus, bulkUpdateApplicationStatus } from '../../services/api';
+import {
+  getAllApplications,
+  updateApplicationStatus,
+  bulkUpdateApplicationStatus,
+  scheduleInterview,
+  issueOfferLetter,
+  getApplicationInterviews
+} from '../../services/api';
 import CompanyLogo from '../../components/CompanyLogo';
 import toast from 'react-hot-toast';
 import {
@@ -20,7 +27,12 @@ import {
   FaPhone,
   FaEnvelope,
   FaTimes,
-  FaIdCard
+  FaIdCard,
+  FaCalendarAlt,
+  FaCalendarPlus,
+  FaAward,
+  FaVideo,
+  FaClock
 } from 'react-icons/fa';
 
 const statusConfig = {
@@ -47,6 +59,107 @@ export default function ReviewApplications() {
 
   // Candidate Details Modal
   const [viewCandidate, setViewCandidate] = useState(null);
+  const [candidateInterviews, setCandidateInterviews] = useState([]);
+
+  // Interview Schedule Modal
+  const [interviewModalApp, setInterviewModalApp] = useState(null);
+  const [interviewForm, setInterviewForm] = useState({
+    round_name: 'Technical Round 1',
+    round_type: 'Technical Interview',
+    scheduled_date: '',
+    duration_minutes: 45,
+    mode: 'Online',
+    location_or_link: '',
+    notes: ''
+  });
+  const [savingInterview, setSavingInterview] = useState(false);
+
+  // Offer Letter Modal
+  const [offerModalApp, setOfferModalApp] = useState(null);
+  const [offerForm, setOfferForm] = useState({
+    offered_ctc: '',
+    joining_date: '',
+    offer_letter_url: ''
+  });
+  const [savingOffer, setSavingOffer] = useState(false);
+
+  // Fetch interviews when opening dossier
+  useEffect(() => {
+    if (viewCandidate?.id) {
+      getApplicationInterviews(viewCandidate.id)
+        .then(({ data }) => setCandidateInterviews(data.interviews || []))
+        .catch(() => setCandidateInterviews([]));
+    } else {
+      setCandidateInterviews([]);
+    }
+  }, [viewCandidate]);
+
+  // Open Interview Modal
+  const handleOpenInterviewModal = (app) => {
+    setInterviewModalApp(app);
+    // default date 2 days in future 10:00 AM
+    const nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + 2);
+    nextDate.setHours(10, 0, 0, 0);
+    const dateStr = nextDate.toISOString().slice(0, 16);
+
+    setInterviewForm({
+      round_name: 'Technical Round 1',
+      round_type: 'Technical Interview',
+      scheduled_date: dateStr,
+      duration_minutes: 45,
+      mode: 'Online',
+      location_or_link: 'https://meet.google.com/xyz-camp-int',
+      notes: 'Prepare core data structures, algorithms, and project walkthrough.'
+    });
+  };
+
+  // Submit Interview
+  const handleScheduleSubmit = async (e) => {
+    e.preventDefault();
+    if (!interviewModalApp) return;
+    setSavingInterview(true);
+    try {
+      await scheduleInterview({
+        application_id: interviewModalApp.id,
+        ...interviewForm
+      });
+      toast.success('Interview round scheduled & student notified! 📅');
+      setInterviewModalApp(null);
+      fetchApps();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to schedule interview');
+    } finally {
+      setSavingInterview(false);
+    }
+  };
+
+  // Open Offer Modal
+  const handleOpenOfferModal = (app) => {
+    setOfferModalApp(app);
+    setOfferForm({
+      offered_ctc: app.job_ctc || '24 LPA',
+      joining_date: new Date(Date.now() + 60 * 24 * 3600 * 1000).toISOString().slice(0, 10),
+      offer_letter_url: app.offer_letter_url || ''
+    });
+  };
+
+  // Submit Offer
+  const handleOfferSubmit = async (e) => {
+    e.preventDefault();
+    if (!offerModalApp) return;
+    setSavingOffer(true);
+    try {
+      await issueOfferLetter(offerModalApp.id, offerForm);
+      toast.success('Official Offer Letter issued & candidate notified! 🏆');
+      setOfferModalApp(null);
+      fetchApps();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to release offer');
+    } finally {
+      setSavingOffer(false);
+    }
+  };
 
   const fetchApps = () => {
     setLoading(true);
@@ -783,6 +896,50 @@ export default function ReviewApplications() {
                           </button>
                         )}
 
+                        {/* Schedule Interview */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenInterviewModal(app)}
+                          title="Schedule Interview Round"
+                          style={{
+                            background: '#eff6ff',
+                            border: '1px solid #bfdbfe',
+                            color: '#2563eb',
+                            padding: '0.35rem 0.65rem',
+                            borderRadius: '6px',
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.3rem'
+                          }}
+                        >
+                          <FaCalendarPlus /> Schedule
+                        </button>
+
+                        {/* Release Offer */}
+                        <button
+                          type="button"
+                          onClick={() => handleOpenOfferModal(app)}
+                          title="Issue Official Offer"
+                          style={{
+                            background: '#f0fdf4',
+                            border: '1px solid #bbf7d0',
+                            color: '#16a34a',
+                            padding: '0.35rem 0.65rem',
+                            borderRadius: '6px',
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.3rem'
+                          }}
+                        >
+                          <FaAward /> Offer
+                        </button>
+
                         {/* View Candidate Full Modal */}
                         <button
                           type="button"
@@ -947,10 +1104,168 @@ export default function ReviewApplications() {
                   <span style={{ color: '#dc2626', fontWeight: 700, fontSize: '0.85rem' }}>Missing Résumé</span>
                 )}
               </div>
+
+              {/* Offer Letter Details (If already issued) */}
+              {viewCandidate.offer_letter_url && (
+                <div style={{ background: '#f0fdf4', border: '1.5px solid #86efac', borderRadius: '12px', padding: '1.1rem', marginTop: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div>
+                    <div style={{ fontWeight: 800, color: '#166534', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <FaAward /> Official Offer Released: {viewCandidate.offered_ctc || 'CTC Specified'}
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: '#15803d', marginTop: '0.2rem' }}>
+                      Joining Date: {viewCandidate.joining_date ? new Date(viewCandidate.joining_date).toLocaleDateString() : 'To be notified'}
+                    </div>
+                  </div>
+                  <a
+                    href={getResumeUrl(viewCandidate.offer_letter_url)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      background: '#16a34a',
+                      color: '#ffffff',
+                      padding: '0.45rem 1rem',
+                      borderRadius: '8px',
+                      fontSize: '0.82rem',
+                      fontWeight: 700,
+                      textDecoration: 'none'
+                    }}
+                  >
+                    View Offer Document
+                  </a>
+                </div>
+              )}
+
+              {/* Scheduled Interview Rounds for this candidate */}
+              <div style={{ marginTop: '1.4rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                  <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase' }}>
+                    Scheduled Interview Rounds ({candidateInterviews.length})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleOpenInterviewModal(viewCandidate)}
+                    style={{
+                      background: '#eff6ff',
+                      color: '#2563eb',
+                      border: '1px solid #bfdbfe',
+                      padding: '0.3rem 0.75rem',
+                      borderRadius: '6px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem'
+                    }}
+                  >
+                    <FaCalendarPlus /> Schedule Next Round
+                  </button>
+                </div>
+
+                {candidateInterviews.length === 0 ? (
+                  <p style={{ fontSize: '0.82rem', color: '#94a3b8', fontStyle: 'italic', margin: '0.5rem 0' }}>
+                    No interview rounds scheduled yet. Click 'Schedule Next Round' to book an assessment.
+                  </p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                    {candidateInterviews.map((iv) => (
+                      <div
+                        key={iv.id}
+                        style={{
+                          background: '#f8fafc',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '10px',
+                          padding: '0.8rem 1rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: '0.8rem'
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#0f172a' }}>
+                            {iv.round_name} ({iv.round_type})
+                          </div>
+                          <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '0.15rem' }}>
+                            📅 {new Date(iv.scheduled_date).toLocaleString()} • {iv.mode} ({iv.duration_minutes} mins)
+                          </div>
+                          {iv.notes && (
+                            <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontStyle: 'italic', marginTop: '0.2rem' }}>
+                              Note: {iv.notes}
+                            </div>
+                          )}
+                        </div>
+                        <a
+                          href={iv.location_or_link.startsWith('http') ? iv.location_or_link : '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            background: '#ffffff',
+                            border: '1px solid #cbd5e1',
+                            color: '#0284c7',
+                            padding: '0.35rem 0.7rem',
+                            borderRadius: '6px',
+                            fontSize: '0.78rem',
+                            fontWeight: 600,
+                            textDecoration: 'none'
+                          }}
+                        >
+                          Meeting Link
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Modal Footer */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '1rem 1.6rem', borderTop: '1px solid #e2e8f0', background: '#f8fafc' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.6rem', borderTop: '1px solid #e2e8f0', background: '#f8fafc' }}>
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleOpenInterviewModal(viewCandidate);
+                  }}
+                  style={{
+                    background: '#2563eb',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <FaCalendarPlus /> Schedule Interview
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleOpenOfferModal(viewCandidate);
+                  }}
+                  style={{
+                    background: '#16a34a',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem'
+                  }}
+                >
+                  <FaAward /> Release Offer Letter
+                </button>
+              </div>
+
               <button
                 type="button"
                 onClick={() => setViewCandidate(null)}
@@ -967,6 +1282,312 @@ export default function ReviewApplications() {
                 Close Dossier
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* SCHEDULE INTERVIEW MODAL                             */}
+      {/* ==================================================== */}
+      {interviewModalApp && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.6)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 1100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem'
+          }}
+          onClick={() => setInterviewModalApp(null)}
+        >
+          <div
+            style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
+              width: 'min(600px, 95vw)',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.2rem 1.5rem', borderBottom: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <FaCalendarPlus style={{ color: '#2563eb', fontSize: '1.2rem' }} />
+                <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#0f172a' }}>
+                  Schedule Interview Round
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setInterviewModalApp(null)}
+                style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.1rem' }}
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            <form onSubmit={handleScheduleSubmit} style={{ padding: '1.5rem' }}>
+              <div style={{ background: '#f8fafc', padding: '0.8rem 1rem', borderRadius: '10px', marginBottom: '1.2rem', border: '1px solid #e2e8f0' }}>
+                <div style={{ fontWeight: 700, color: '#0f172a' }}>{interviewModalApp.student_name}</div>
+                <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                  {interviewModalApp.job_title} at {interviewModalApp.company}
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                    Round Title *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={interviewForm.round_name}
+                    onChange={(e) => setInterviewForm({ ...interviewForm, round_name: e.target.value })}
+                    placeholder="e.g. Technical Round 1"
+                    style={{ width: '100%', padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                    Round Type *
+                  </label>
+                  <select
+                    value={interviewForm.round_type}
+                    onChange={(e) => setInterviewForm({ ...interviewForm, round_type: e.target.value })}
+                    style={{ width: '100%', padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                  >
+                    <option value="Online Assessment">Online Assessment</option>
+                    <option value="Technical Interview">Technical Interview</option>
+                    <option value="HR Interview">HR Interview</option>
+                    <option value="Managerial Round">Managerial Round</option>
+                    <option value="Group Discussion">Group Discussion</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                    Date & Time *
+                  </label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={interviewForm.scheduled_date}
+                    onChange={(e) => setInterviewForm({ ...interviewForm, scheduled_date: e.target.value })}
+                    style={{ width: '100%', padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                    Mode & Duration
+                  </label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <select
+                      value={interviewForm.mode}
+                      onChange={(e) => setInterviewForm({ ...interviewForm, mode: e.target.value })}
+                      style={{ flex: 1, padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                    >
+                      <option value="Online">Online</option>
+                      <option value="In-Person / Campus">In-Person</option>
+                    </select>
+                    <input
+                      type="number"
+                      value={interviewForm.duration_minutes}
+                      onChange={(e) => setInterviewForm({ ...interviewForm, duration_minutes: Number(e.target.value) })}
+                      placeholder="Mins"
+                      style={{ width: '80px', padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                  Meeting Link or Campus Room *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={interviewForm.location_or_link}
+                  onChange={(e) => setInterviewForm({ ...interviewForm, location_or_link: e.target.value })}
+                  placeholder="https://meet.google.com/abc-xyz or Placement Cell Room 204"
+                  style={{ width: '100%', padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.4rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                  Preparation Notes / Instructions
+                </label>
+                <textarea
+                  rows={2}
+                  value={interviewForm.notes}
+                  onChange={(e) => setInterviewForm({ ...interviewForm, notes: e.target.value })}
+                  placeholder="Instructions for the candidate..."
+                  style={{ width: '100%', padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.8rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setInterviewModalApp(null)}
+                  style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', padding: '0.55rem 1.2rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingInterview}
+                  style={{
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.55rem 1.5rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+                  }}
+                >
+                  {savingInterview ? 'Booking...' : 'Confirm & Notify Student'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* RELEASE OFFER LETTER MODAL                           */}
+      {/* ==================================================== */}
+      {offerModalApp && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.6)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 1100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem'
+          }}
+          onClick={() => setOfferModalApp(null)}
+        >
+          <div
+            style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
+              width: 'min(550px, 95vw)',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.2rem 1.5rem', borderBottom: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <FaAward style={{ color: '#16a34a', fontSize: '1.2rem' }} />
+                <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#0f172a' }}>
+                  Release Official Offer Letter
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOfferModalApp(null)}
+                style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.1rem' }}
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            <form onSubmit={handleOfferSubmit} style={{ padding: '1.5rem' }}>
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '0.8rem 1rem', borderRadius: '10px', marginBottom: '1.2rem' }}>
+                <div style={{ fontWeight: 800, color: '#166534' }}>{offerModalApp.student_name}</div>
+                <div style={{ fontSize: '0.82rem', color: '#15803d' }}>
+                  {offerModalApp.job_title} at {offerModalApp.company}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                  Final Offered CTC / Package *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={offerForm.offered_ctc}
+                  onChange={(e) => setOfferForm({ ...offerForm, offered_ctc: e.target.value })}
+                  placeholder="e.g. 24 LPA or 45,000/month"
+                  style={{ width: '100%', padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                  Tentative Joining Date *
+                </label>
+                <input
+                  type="date"
+                  required
+                  value={offerForm.joining_date}
+                  onChange={(e) => setOfferForm({ ...offerForm, joining_date: e.target.value })}
+                  style={{ width: '100%', padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '1.4rem' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                  Offer Letter PDF Link or Cloud URL
+                </label>
+                <input
+                  type="url"
+                  value={offerForm.offer_letter_url}
+                  onChange={(e) => setOfferForm({ ...offerForm, offer_letter_url: e.target.value })}
+                  placeholder="https://drive.google.com/file/... or /uploads/offer-letter.pdf"
+                  style={{ width: '100%', padding: '0.55rem 0.8rem', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.88rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.8rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setOfferModalApp(null)}
+                  style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', color: '#475569', padding: '0.55rem 1.2rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingOffer}
+                  style={{
+                    background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '0.55rem 1.6rem',
+                    borderRadius: '8px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(22, 163, 74, 0.3)'
+                  }}
+                >
+                  {savingOffer ? 'Releasing...' : 'Confirm Selection & Issue Offer'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

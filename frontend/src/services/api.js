@@ -37,6 +37,19 @@ export const updateApplicationStatus = (id, status) =>
 export const bulkUpdateApplicationStatus = (ids, status) =>
   API.patch('/applications/bulk-status', { ids, status });
 export const withdrawApplication = (id) => API.delete(`/applications/${id}`);
+export const issueOfferLetter = (id, data) =>
+  API.post(`/applications/${id}/offer`, data);
+
+// ---- Notifications APIs ----
+export const getNotifications = () => API.get('/notifications');
+export const markNotificationRead = (id) => API.patch(`/notifications/${id}/read`);
+export const markAllNotificationsRead = () => API.patch('/notifications/read-all');
+
+// ---- Interviews APIs ----
+export const scheduleInterview = (data) => API.post('/interviews', data);
+export const getMyInterviews = () => API.get('/interviews/my');
+export const getApplicationInterviews = (appId) => API.get(`/interviews/application/${appId}`);
+export const updateInterviewStatus = (id, status) => API.patch(`/interviews/${id}/status`, { status });
 
 // ---- Profile APIs ----
 export const getProfile = () => API.get('/profile');

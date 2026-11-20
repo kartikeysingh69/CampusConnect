@@ -1,7 +1,8 @@
-// src/components/Navbar.jsx — CampusConnect Navbar with custom brand logo
+// src/components/Navbar.jsx — CampusConnect Navbar with notification center
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { FaSignOutAlt, FaUser } from 'react-icons/fa';
+import NotificationBell from './NotificationBell';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -22,7 +23,7 @@ export default function Navbar() {
         />
         <span className="brand-text">CampusConnect</span>
       </Link>
-      <div className="navbar-links">
+      <div className="navbar-links" style={{ display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
         {user ? (
           <>
             {user.role === 'student' && (
@@ -39,6 +40,10 @@ export default function Navbar() {
                 <Link to="/admin/applications">Applications</Link>
               </>
             )}
+
+            {/* Notification Bell */}
+            <NotificationBell />
+
             <span className="user-badge">
               <FaUser /> {user.name} ({user.role})
             </span>

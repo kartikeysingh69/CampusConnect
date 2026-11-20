@@ -33,12 +33,16 @@ const jobRoutes = require('./routes/jobs');
 const applicationRoutes = require('./routes/applications');
 const profileRoutes = require('./routes/profile');
 const statsRoutes = require('./routes/stats');
+const { router: notificationRoutes } = require('./routes/notifications');
+const interviewRoutes = require('./routes/interviews');
 
 app.use('/api/auth', authRoutes);             // /api/auth/register, /api/auth/login
 app.use('/api/jobs', jobRoutes);              // /api/jobs (list, create, detail)
 app.use('/api/applications', applicationRoutes); // /api/applications (apply, status)
 app.use('/api/profile', profileRoutes);       // /api/profile (get, update)
 app.use('/api/stats', statsRoutes);           // /api/stats (admin dashboard)
+app.use('/api/notifications', notificationRoutes); // /api/notifications (get, read)
+app.use('/api/interviews', interviewRoutes);   // /api/interviews (schedule, list)
 
 // ---- Health Check Route (Test karne ke liye) ----
 app.get('/', (req, res) => {

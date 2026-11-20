@@ -2695,3 +2695,31 @@ tr:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ========================================================== */
+/* Print-Specific Styles for NAAC / NIRF Placement Audit Report */
+/* ========================================================== */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-nirf-report,
+  #printable-nirf-report * {
+    visibility: visible;
+  }
+  #printable-nirf-report {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 12mm !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
