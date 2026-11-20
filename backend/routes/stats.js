@@ -33,13 +33,29 @@ router.get('/', verifyToken, async (req, res) => {
       "SELECT COUNT(*) as rejected FROM applications WHERE status = 'rejected'"
     );
 
-    // Company-wise application count
+    // Company-wise application count & selection
     const [companyStats] = await db.query(
-      `SELECT j.company, COUNT(a.id) as applications,
+      `SELECT j.company, 
+              COUNT(DISTINCT j.id) as drivesCount,
+              COUNT(a.id) as applications,
+              SUM(CASE WHEN a.status = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted,
               SUM(CASE WHEN a.status = 'selected' THEN 1 ELSE 0 END) as selected
        FROM jobs j
        LEFT JOIN applications a ON j.id = a.job_id
-       GROUP BY j.company`
+       GROUP BY j.company
+       ORDER BY applications DESC, drivesCount DESC`
+    );
+
+    // Stream-wise distribution
+    const [streamStats] = await db.query(
+      `SELECT j.stream,
+              COUNT(DISTINCT j.id) as drivesCount,
+              COUNT(a.id) as applications,
+              SUM(CASE WHEN a.status = 'selected' THEN 1 ELSE 0 END) as selected
+       FROM jobs j
+       LEFT JOIN applications a ON j.id = a.job_id
+       GROUP BY j.stream
+       ORDER BY drivesCount DESC`
     );
 
     res.json({
@@ -50,7 +66,8 @@ router.get('/', verifyToken, async (req, res) => {
       selected,
       shortlisted,
       rejected,
-      companyStats
+      companyStats,
+      streamStats
     });
   } catch (err) {
     res.status(500).json({ message: 'Error fetching stats', error: err.message });
