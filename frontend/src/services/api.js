@@ -34,6 +34,13 @@ export const updateApplicationStatus = (id, status) =>
 // ---- Profile APIs ----
 export const getProfile = () => API.get('/profile');
 export const updateProfile = (data) => API.put('/profile', data);
+export const uploadResume = (formData) =>
+  API.post('/profile/upload-resume', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+export const updateResumeUrl = (resume_url) =>
+  API.put('/profile/resume-url', { resume_url });
+export const deleteResume = () => API.delete('/profile/resume');
 
 // ---- Stats API ----
 export const getStats = () => API.get('/stats');

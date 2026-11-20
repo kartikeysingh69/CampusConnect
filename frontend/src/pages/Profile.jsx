@@ -1,7 +1,7 @@
 // src/pages/Profile.jsx — Student Profile Workspace (Dynamic per logged-in user, warm orange light theme)
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProfile, updateProfile } from '../services/api';
+import { getProfile, updateProfile, uploadResume, deleteResume } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import {
@@ -30,7 +30,11 @@ import {
   FaShieldAlt,
   FaGlobe,
   FaExternalLinkAlt,
-  FaLocationArrow
+  FaLocationArrow,
+  FaFileAlt,
+  FaFilePdf,
+  FaEye,
+  FaTrash
 } from 'react-icons/fa';
 
 // Theme tokens matching the website's warm orange/amber light theme
@@ -62,6 +66,15 @@ export default function Profile() {
   const { user, loginUser } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const resumeFileInputRef = useRef(null);
+  const [uploadingResume, setUploadingResume] = useState(false);
+
+  // Helper for full resume URL (handles local /uploads and external http links)
+  const getFullResumeUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return `http://localhost:5000${url}`;
+  };
 
   // Dynamic initial profile state — NO hardcoded data of other students
   const [profile, setProfile] = useState({
@@ -87,6 +100,7 @@ export default function Profile() {
     branch: '',
     graduation_year: '',
     profile_pic: '',
+    resume_url: '',
     college_id_card_uploaded: false,
     ews_certificate_uploaded: false,
     academics: [],
@@ -128,6 +142,26 @@ export default function Profile() {
           } catch (e) {}
         }
 
+        const activeResumeUrl = data.resume_url || meta.resume_url || '';
+
+        const defaultDocs = [
+          { name: 'Résumé', uploaded: Boolean(activeResumeUrl) },
+          { name: 'College ID card', uploaded: Boolean(meta.college_id_card_uploaded) },
+          { name: 'Covering letter', uploaded: false },
+          { name: 'Transcript', uploaded: false },
+          { name: 'Document', uploaded: false },
+          { name: 'Government ID', uploaded: false },
+          { name: 'EWS / income certificate', uploaded: Boolean(meta.ews_certificate_uploaded) }
+        ];
+
+        const rawDocs = Array.isArray(meta.documents) && meta.documents.length ? meta.documents : defaultDocs;
+        const normalizedDocs = rawDocs.map((doc) => {
+          if (doc.name === 'Résumé') return { ...doc, uploaded: Boolean(activeResumeUrl) };
+          if (doc.name === 'College ID card') return { ...doc, uploaded: Boolean(meta.college_id_card_uploaded) };
+          if (doc.name === 'EWS / income certificate') return { ...doc, uploaded: Boolean(meta.ews_certificate_uploaded) };
+          return doc;
+        });
+
         const loadedProfile = {
           name: data.name || user.name || '',
           email: data.email || user.email || '',
@@ -136,6 +170,7 @@ export default function Profile() {
           branch: data.branch || meta.branch || '',
           bio: data.bio || meta.bio || '',
           profile_pic: data.profile_pic || meta.profile_pic || '',
+          resume_url: activeResumeUrl,
           github: data.github || meta.github || '',
           linkedin: data.linkedin || meta.linkedin || '',
           institute: meta.institute || data.college_id || '',
@@ -160,17 +195,7 @@ export default function Profile() {
             ? data.skills.split(',').map((s) => s.trim()).filter(Boolean)
             : (Array.isArray(meta.skills) ? meta.skills : []),
           locations: Array.isArray(meta.locations) ? meta.locations : [],
-          documents: Array.isArray(meta.documents) && meta.documents.length
-            ? meta.documents
-            : [
-                { name: 'Résumé', uploaded: false },
-                { name: 'College ID card', uploaded: false },
-                { name: 'Covering letter', uploaded: false },
-                { name: 'Transcript', uploaded: false },
-                { name: 'Document', uploaded: false },
-                { name: 'Government ID', uploaded: false },
-                { name: 'EWS / income certificate', uploaded: false }
-              ],
+          documents: normalizedDocs,
           languages: Array.isArray(meta.languages) ? meta.languages : [],
           work_experience: Array.isArray(meta.work_experience) ? meta.work_experience : []
         };
@@ -191,23 +216,115 @@ export default function Profile() {
     });
     if (targetField === 'bio') setActiveTab('statement');
     else if (targetField === 'skills' || targetField === 'area_of_interest') setActiveTab('skills');
-    else if (targetField === 'college_id_card' || targetField === 'ews') setActiveTab('documents');
+    else if (targetField === 'college_id_card' || targetField === 'ews' || targetField === 'resume') setActiveTab('documents');
     else setActiveTab('basic');
     setModalOpen(true);
+  };
+
+  // Direct resume upload via file picker
+  const handleDirectResumeUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validExts = ['.pdf', '.doc', '.docx'];
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!validExts.includes(ext)) {
+      toast.error('Only PDF, DOC, and DOCX files are allowed!');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be under 5MB!');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('resume', file);
+
+    setUploadingResume(true);
+    try {
+      const { data } = await uploadResume(formData);
+      toast.success('Resume uploaded successfully! 📄');
+      setProfile((prev) => ({
+        ...prev,
+        resume_url: data.resume_url,
+        documents: prev.documents.map((d) => (d.name === 'Résumé' ? { ...d, uploaded: true } : d))
+      }));
+      setEditForm((prev) => ({ ...prev, resume_url: data.resume_url }));
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to upload resume');
+    } finally {
+      setUploadingResume(false);
+      if (resumeFileInputRef.current) resumeFileInputRef.current.value = '';
+    }
+  };
+
+  // Resume upload from inside modal
+  const handleModalResumeUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validExts = ['.pdf', '.doc', '.docx'];
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (!validExts.includes(ext)) {
+      toast.error('Only PDF, DOC, and DOCX files are allowed!');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be under 5MB!');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('resume', file);
+
+    setUploadingResume(true);
+    try {
+      const { data } = await uploadResume(formData);
+      toast.success('Resume uploaded successfully! 📄');
+      setEditForm((prev) => ({ ...prev, resume_url: data.resume_url }));
+      setProfile((prev) => ({
+        ...prev,
+        resume_url: data.resume_url,
+        documents: prev.documents.map((d) => (d.name === 'Résumé' ? { ...d, uploaded: true } : d))
+      }));
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to upload resume');
+    } finally {
+      setUploadingResume(false);
+      e.target.value = '';
+    }
+  };
+
+  // Remove resume
+  const handleDeleteResume = async () => {
+    if (!window.confirm('Are you sure you want to remove your attached resume?')) return;
+    try {
+      await deleteResume();
+      toast.success('Resume removed successfully');
+      setProfile((prev) => ({
+        ...prev,
+        resume_url: '',
+        documents: prev.documents.map((d) => (d.name === 'Résumé' ? { ...d, uploaded: false } : d))
+      }));
+      setEditForm((prev) => ({ ...prev, resume_url: '' }));
+    } catch (err) {
+      toast.error('Failed to remove resume');
+    }
   };
 
   // Profile Completeness calculation based on logged-in student's actual data
   const { completeness, missingFields } = useMemo(() => {
     const checks = [
+      { id: 'resume', label: 'Student Résumé', filled: Boolean(profile.resume_url && profile.resume_url.trim()) },
       { id: 'bio', label: 'About Me Statement', filled: Boolean(profile.bio && profile.bio.trim()) },
       { id: 'area_of_interest', label: 'Area of Interest', filled: Boolean(profile.area_of_interest && profile.area_of_interest.trim() && profile.area_of_interest !== '—') },
       { id: 'college_id_card', label: 'College ID Card', filled: Boolean(profile.college_id_card_uploaded) },
       { id: 'ews_certificate', label: 'EWS / income certificate', filled: Boolean(profile.ews_certificate_uploaded) }
     ];
     const missing = checks.filter((c) => !c.filled);
-    const resolvedCount = 4 - missing.length;
-    // Base 50% for account creation + 12.5% per completed mandatory field
-    const finalPct = Math.round(50 + resolvedCount * 12.5);
+    const resolvedCount = 5 - missing.length;
+    // Base 50% for account creation + 10% per completed mandatory field
+    const finalPct = Math.round(50 + resolvedCount * 10);
     return { completeness: Math.min(100, finalPct), missingFields: missing };
   }, [profile]);
 
@@ -255,6 +372,7 @@ export default function Profile() {
         branch: updatedProfile.branch || updatedProfile.course,
         bio: updatedProfile.bio,
         skills: skillsArray.join(', '),
+        resume_url: updatedProfile.resume_url,
         github: updatedProfile.github,
         linkedin: updatedProfile.linkedin,
         college_id: (updatedProfile.institute || '').substring(0, 50),
@@ -591,34 +709,230 @@ export default function Profile() {
         ))}
 
         {/* ==================================================== */}
-        {/* 5. Uploaded Documents                                */}
+        {/* 5. Uploaded Documents & Résumé Management            */}
         {/* ==================================================== */}
-        {renderSection('UPLOADED DOCUMENTS', FaFileUpload, '#ea580c', (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem' }}>
-            {profile.documents.map((doc, idx) => {
-              const isUploaded = doc.uploaded;
-              return (
-                <span
-                  key={idx}
+        {renderSection('RÉSUMÉ & UPLOADED DOCUMENTS', FaFileUpload, '#ea580c', (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            {/* Hidden file input for direct upload */}
+            <input
+              type="file"
+              ref={resumeFileInputRef}
+              accept=".pdf,.doc,.docx"
+              onChange={handleDirectResumeUpload}
+              style={{ display: 'none' }}
+            />
+
+            {/* Resume Hero Box */}
+            <div
+              style={{
+                background: profile.resume_url ? '#f0fdf4' : '#fffbeb',
+                border: `1.5px solid ${profile.resume_url ? '#bbf7d0' : '#fde68a'}`,
+                borderRadius: '14px',
+                padding: '1.25rem 1.4rem',
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '1rem',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div
                   style={{
-                    background: isUploaded ? '#e0f2fe' : '#ffffff',
-                    color: isUploaded ? '#0369a1' : '#64748b',
-                    border: `1.5px solid ${isUploaded ? '#bae6fd' : '#e2e8f0'}`,
-                    padding: '0.45rem 1rem',
-                    borderRadius: '20px',
-                    fontSize: '0.82rem',
-                    fontWeight: 600,
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '12px',
+                    background: profile.resume_url ? '#dcfce7' : '#fef3c7',
+                    color: profile.resume_url ? '#16a34a' : '#d97706',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.45rem',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+                    justifyContent: 'center',
+                    fontSize: '1.4rem'
                   }}
                 >
-                  {isUploaded ? <FaCheck style={{ fontSize: '0.72rem', color: '#0284c7' }} /> : null}
-                  {doc.name}
-                </span>
-              );
-            })}
+                  <FaFilePdf />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.98rem', color: '#0f172a' }}>
+                      Primary Placement Résumé
+                    </span>
+                    {profile.resume_url ? (
+                      <span
+                        style={{
+                          background: '#16a34a',
+                          color: '#ffffff',
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          padding: '0.15rem 0.6rem',
+                          borderRadius: '10px'
+                        }}
+                      >
+                        ATTACHED
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          background: '#ea580c',
+                          color: '#ffffff',
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          padding: '0.15rem 0.6rem',
+                          borderRadius: '10px'
+                        }}
+                      >
+                        MISSING
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.82rem', color: profile.resume_url ? '#15803d' : '#b45309' }}>
+                    {profile.resume_url
+                      ? 'Companies and campus placement drives will automatically receive this resume.'
+                      : '⚠️ Warning: Recruiter drives require a résumé to shortlist your profile!'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                {profile.resume_url ? (
+                  <>
+                    <a
+                      href={getFullResumeUrl(profile.resume_url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        background: '#ffffff',
+                        border: '1.5px solid #16a34a',
+                        color: '#16a34a',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        textDecoration: 'none',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <FaEye /> View Résumé
+                    </a>
+                    <button
+                      type="button"
+                      disabled={uploadingResume}
+                      onClick={() => resumeFileInputRef.current?.click()}
+                      style={{
+                        background: '#16a34a',
+                        border: 'none',
+                        color: '#ffffff',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <FaFileUpload /> {uploadingResume ? 'Uploading...' : 'Replace'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDeleteResume}
+                      title="Remove Resume"
+                      style={{
+                        background: '#fee2e2',
+                        border: '1px solid #fca5a5',
+                        color: '#dc2626',
+                        padding: '0.5rem 0.75rem',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <FaTrash />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      disabled={uploadingResume}
+                      onClick={() => resumeFileInputRef.current?.click()}
+                      style={{
+                        background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                        border: 'none',
+                        color: '#ffffff',
+                        padding: '0.55rem 1.25rem',
+                        borderRadius: '8px',
+                        fontSize: '0.86rem',
+                        fontWeight: 700,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 12px rgba(234, 88, 12, 0.25)'
+                      }}
+                    >
+                      <FaFileUpload /> {uploadingResume ? 'Uploading...' : 'Upload Résumé (.PDF, .DOCX)'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openEditModal('resume')}
+                      style={{
+                        background: '#ffffff',
+                        border: '1px solid #fed7aa',
+                        color: '#ea580c',
+                        padding: '0.55rem 1rem',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Add Cloud Link
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Verification Documents Pills */}
+            <div>
+              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', marginBottom: '0.55rem' }}>
+                Additional Verification Documents:
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem' }}>
+                {profile.documents.map((doc, idx) => {
+                  const isUploaded = doc.uploaded;
+                  return (
+                    <span
+                      key={idx}
+                      style={{
+                        background: isUploaded ? '#e0f2fe' : '#ffffff',
+                        color: isUploaded ? '#0369a1' : '#64748b',
+                        border: `1.5px solid ${isUploaded ? '#bae6fd' : '#e2e8f0'}`,
+                        padding: '0.45rem 1rem',
+                        borderRadius: '20px',
+                        fontSize: '0.82rem',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.02)'
+                      }}
+                    >
+                      {isUploaded ? <FaCheck style={{ fontSize: '0.72rem', color: '#0284c7' }} /> : null}
+                      {doc.name}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         ))}
 
@@ -940,7 +1254,72 @@ export default function Profile() {
               )}
 
               {activeTab === 'documents' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.25rem' }}>
+                  {/* Primary Resume Section */}
+                  <div style={{ background: '#fff7ed', border: '1.5px dashed #fed7aa', borderRadius: '12px', padding: '1.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.8rem' }}>
+                      <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#9a3412', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <FaFileUpload /> Placement Résumé (.pdf, .doc, .docx)
+                      </span>
+                      {editForm.resume_url ? (
+                        <span style={{ background: '#dcfce7', color: '#15803d', fontSize: '0.78rem', padding: '0.2rem 0.6rem', borderRadius: '12px', fontWeight: 700 }}>
+                          ✓ Attached
+                        </span>
+                      ) : (
+                        <span style={{ background: '#fee2e2', color: '#dc2626', fontSize: '0.78rem', padding: '0.2rem 0.6rem', borderRadius: '12px', fontWeight: 700 }}>
+                          Required
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.9rem' }}>
+                      <label style={{
+                        background: '#ea580c',
+                        color: '#ffffff',
+                        padding: '0.55rem 1.1rem',
+                        borderRadius: '8px',
+                        fontSize: '0.85rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem'
+                      }}>
+                        <FaFileUpload /> {uploadingResume ? 'Uploading...' : 'Upload File (.pdf / .docx)'}
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          onChange={handleModalResumeUpload}
+                          disabled={uploadingResume}
+                          style={{ display: 'none' }}
+                        />
+                      </label>
+                      <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Max file size 5MB</span>
+                    </div>
+
+                    {renderField('Or Paste Cloud Résumé URL (Google Drive / OneDrive / Portfolio)', 'url', editForm.resume_url, (v) => setEditForm({ ...editForm, resume_url: v }), undefined, 'https://drive.google.com/file/d/...')}
+
+                    {editForm.resume_url && (
+                      <div style={{ marginTop: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.9rem' }}>
+                        <a
+                          href={getFullResumeUrl(editForm.resume_url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ color: '#ea580c', fontSize: '0.82rem', fontWeight: 600, textDecoration: 'underline' }}
+                        >
+                          Preview Attached Resume
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setEditForm({ ...editForm, resume_url: '' })}
+                          style={{ color: '#ef4444', background: 'none', border: 'none', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   {renderCheckbox('College ID Card', 'Upload or verify college ID badge', editForm.college_id_card_uploaded, (v) => setEditForm({ ...editForm, college_id_card_uploaded: v }))}
                   {renderCheckbox('EWS / Income Certificate', 'Certificate verification for reserved schemes', editForm.ews_certificate_uploaded, (v) => setEditForm({ ...editForm, ews_certificate_uploaded: v }))}
                 </div>

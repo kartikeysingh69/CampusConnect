@@ -1,7 +1,7 @@
 // src/pages/JobDetail.jsx — Full-width 2-column job detail with company info, map & recommendations
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getJobById, applyForJob, getMyApplications, getJobs } from '../services/api';
+import { getJobById, applyForJob, getMyApplications, getJobs, getProfile } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import CompanyLogo from '../components/CompanyLogo';
 import toast from 'react-hot-toast';
@@ -160,6 +160,23 @@ export default function JobDetail() {
     }
     setApplying(true);
     try {
+      // Check if student has uploaded a resume in their profile
+      try {
+        const { data: studentProfile } = await getProfile();
+        if (!studentProfile?.resume_url) {
+          const proceed = window.confirm(
+            '⚠️ Notice: You have not uploaded a Résumé to your profile!\n\nCompanies typically reject applicants without a résumé. Do you want to continue applying anyway, or cancel and upload your résumé in Profile first?'
+          );
+          if (!proceed) {
+            setApplying(false);
+            navigate('/profile');
+            return;
+          }
+        }
+      } catch (profileErr) {
+        console.warn('Profile check error:', profileErr);
+      }
+
       await applyForJob(Number(id));
       toast.success('Application submitted successfully! 🎉');
       setHasApplied(true);

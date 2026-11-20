@@ -41,10 +41,12 @@ router.post('/', verifyToken, async (req, res) => {
 router.get('/my', verifyToken, async (req, res) => {
   try {
     const [applications] = await db.query(
-      `SELECT a.id, a.status, a.applied_at, 
-              j.title, j.company, j.location, j.ctc 
+      `SELECT a.id, a.job_id, a.status, a.applied_at, 
+              j.title, j.company, j.location, j.ctc,
+              u.resume_url as student_resume
        FROM applications a 
        JOIN jobs j ON a.job_id = j.id 
+       JOIN users u ON a.student_id = u.id
        WHERE a.student_id = ? 
        ORDER BY a.applied_at DESC`,
       [req.user.id]
@@ -63,8 +65,9 @@ router.get('/', verifyToken, async (req, res) => {
   }
   try {
     const [applications] = await db.query(
-      `SELECT a.id, a.status, a.applied_at,
-              u.name as student_name, u.email as student_email,
+      `SELECT a.id, a.job_id, a.status, a.applied_at,
+              u.name as student_name, u.email as student_email, u.phone as student_phone,
+              u.resume_url as student_resume, u.branch as student_branch, u.cgpa as student_cgpa,
               j.title as job_title, j.company
        FROM applications a
        JOIN users u ON a.student_id = u.id
