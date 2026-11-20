@@ -34,6 +34,8 @@ export const getMyApplications = () => API.get('/applications/my');
 export const getAllApplications = () => API.get('/applications');
 export const updateApplicationStatus = (id, status) =>
   API.patch(`/applications/${id}/status`, { status });
+export const bulkUpdateApplicationStatus = (ids, status) =>
+  API.patch('/applications/bulk-status', { ids, status });
 
 // ---- Profile APIs ----
 export const getProfile = () => API.get('/profile');

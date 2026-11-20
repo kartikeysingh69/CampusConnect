@@ -68,7 +68,8 @@ router.get('/', verifyToken, async (req, res) => {
       `SELECT a.id, a.job_id, a.status, a.applied_at,
               u.name as student_name, u.email as student_email, u.phone as student_phone,
               u.resume_url as student_resume, u.branch as student_branch, u.cgpa as student_cgpa,
-              j.title as job_title, j.company
+              u.skills as student_skills, u.graduation_year as student_grad_year, u.college_id as student_college,
+              j.title as job_title, j.company, j.location as job_location, j.ctc as job_ctc, j.stream as job_stream
        FROM applications a
        JOIN users u ON a.student_id = u.id
        JOIN jobs j ON a.job_id = j.id
@@ -77,6 +78,29 @@ router.get('/', verifyToken, async (req, res) => {
     res.json({ applications, count: applications.length });
   } catch (err) {
     res.status(500).json({ message: 'Error fetching applications', error: err.message });
+  }
+});
+
+// ---- PATCH Bulk update application status (Admin) ----
+router.patch('/bulk-status', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access only' });
+  }
+
+  const { ids, status } = req.body;
+  const validStatuses = ['applied', 'shortlisted', 'rejected', 'selected'];
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ message: 'Please provide application ids to update' });
+  }
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: `Invalid status. Use: ${validStatuses.join(', ')}` });
+  }
+
+  try {
+    await db.query('UPDATE applications SET status = ? WHERE id IN (?)', [status, ids]);
+    res.json({ message: `✅ ${ids.length} application(s) marked as "${status}"` });
+  } catch (err) {
+    res.status(500).json({ message: 'Error updating bulk status', error: err.message });
   }
 });
 
