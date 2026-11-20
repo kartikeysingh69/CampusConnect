@@ -7,5 +7,6 @@ dist/
 uploads/
 backend/uploads/
 mysql-data/
+.kilo/
 .kombai/
 .DS_Store
