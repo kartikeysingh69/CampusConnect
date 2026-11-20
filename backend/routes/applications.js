@@ -42,7 +42,7 @@ router.get('/my', verifyToken, async (req, res) => {
   try {
     const [applications] = await db.query(
       `SELECT a.id, a.job_id, a.status, a.applied_at, 
-              j.title, j.company, j.location, j.ctc,
+              j.title, j.company, j.location, j.ctc, j.stream, j.job_type, j.deadline, j.status as job_status,
               u.resume_url as student_resume
        FROM applications a 
        JOIN jobs j ON a.job_id = j.id 
@@ -122,6 +122,34 @@ router.patch('/:id/status', verifyToken, async (req, res) => {
     res.json({ message: `✅ Status updated to "${status}"` });
   } catch (err) {
     res.status(500).json({ message: 'Error updating status', error: err.message });
+  }
+});
+
+// ---- DELETE withdraw application (Student only) ----
+// URL: DELETE http://localhost:5000/api/applications/:id
+router.delete('/:id', verifyToken, async (req, res) => {
+  if (req.user.role !== 'student') {
+    return res.status(403).json({ message: 'Only students can withdraw applications' });
+  }
+
+  try {
+    const [rows] = await db.query(
+      'SELECT id, status FROM applications WHERE id = ? AND student_id = ?',
+      [req.params.id, req.user.id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Application not found or unauthorized' });
+    }
+
+    if (rows[0].status === 'selected') {
+      return res.status(400).json({ message: 'Cannot withdraw after being selected! Please contact your campus placement cell.' });
+    }
+
+    await db.query('DELETE FROM applications WHERE id = ? AND student_id = ?', [req.params.id, req.user.id]);
+    res.json({ message: '✅ Application withdrawn successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error withdrawing application', error: err.message });
   }
 });
 

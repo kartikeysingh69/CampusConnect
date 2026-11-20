@@ -36,6 +36,7 @@ export const updateApplicationStatus = (id, status) =>
   API.patch(`/applications/${id}/status`, { status });
 export const bulkUpdateApplicationStatus = (ids, status) =>
   API.patch('/applications/bulk-status', { ids, status });
+export const withdrawApplication = (id) => API.delete(`/applications/${id}`);
 
 // ---- Profile APIs ----
 export const getProfile = () => API.get('/profile');
