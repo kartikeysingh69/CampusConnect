@@ -30,7 +30,10 @@ export default function Navbar() {
               <>
                 <Link to="/jobs">Drives</Link>
                 <Link to="/my-applications">My Applications</Link>
-                <Link to="/ats-checker" style={{ color: '#ea580c', fontWeight: 700 }}>AI ATS</Link>
+                <Link to="/assessment" style={{ color: '#ea580c', fontWeight: 700 }}>Coding Test</Link>
+                <Link to="/messages">Messages</Link>
+                <Link to="/ats-checker">AI ATS</Link>
+                <Link to="/analytics">Analytics</Link>
                 <Link to="/mock-prep">Prep Q&A</Link>
                 <Link to="/forum">TPO Bulletin</Link>
                 <Link to="/profile">Profile</Link>
@@ -40,6 +43,7 @@ export default function Navbar() {
               <>
                 <Link to="/recruiter" style={{ color: '#ea580c', fontWeight: 800 }}>Recruiter Portal</Link>
                 <Link to="/jobs">Browse Drives</Link>
+                <Link to="/messages">Candidate Messages</Link>
                 <Link to="/forum">TPO Bulletin</Link>
               </>
             )}
@@ -48,6 +52,8 @@ export default function Navbar() {
                 <Link to="/admin">Dashboard</Link>
                 <Link to="/admin/jobs">Manage Jobs</Link>
                 <Link to="/admin/applications">Applications</Link>
+                <Link to="/messages">Messages</Link>
+                <Link to="/analytics">Analytics</Link>
                 <Link to="/forum">TPO Bulletin</Link>
               </>
             )}
@@ -65,6 +71,8 @@ export default function Navbar() {
         ) : (
           <>
             <Link to="/jobs">Explore Jobs</Link>
+            <Link to="/assessment">Coding Test</Link>
+            <Link to="/analytics">Analytics</Link>
             <Link to="/mock-prep">Interview Prep</Link>
             <Link to="/forum">TPO Bulletin</Link>
             <Link to="/login">Login</Link>

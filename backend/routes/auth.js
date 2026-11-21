@@ -111,4 +111,61 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// ---- GOOGLE SSO (Phase 13: Simulated Institutional Single Sign-On) ----
+// URL: POST http://localhost:5000/api/auth/google-sso
+router.post('/google-sso', async (req, res) => {
+  const { email, name, role = 'student' } = req.body;
+  if (!email || !name) {
+    return res.status(400).json({ message: 'Email and name are required' });
+  }
+
+  try {
+    let [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    let user;
+
+    if (users.length === 0) {
+      const dummyPassword = await bcrypt.hash(`SSO_GOOGLE_${Date.now()}`, 10);
+      const [result] = await db.query(
+        'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+        [name, email, dummyPassword, role]
+      );
+      user = {
+        id: result.insertId,
+        name,
+        email,
+        role,
+        company_name: null
+      };
+    } else {
+      user = users[0];
+    }
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        company_name: user.company_name
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      message: '✅ Google SSO sign-in successful!',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        company_name: user.company_name
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'SSO server error', error: err.message });
+  }
+});
+
 module.exports = router;

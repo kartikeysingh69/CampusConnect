@@ -18,6 +18,10 @@ import RecruiterDashboard from './pages/recruiter/RecruiterDashboard';
 import AtsChecker from './pages/AtsChecker';
 import MockInterview from './pages/MockInterview';
 import Forum from './pages/Forum';
+import CodingAssessment from './pages/CodingAssessment';
+import Messages from './pages/Messages';
+import Analytics from './pages/Analytics';
+import CampusBot from './components/CampusBot';
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -66,6 +70,22 @@ function AppRoutes() {
 
       {/* TPO Bulletin & Drive Q&A Forum */}
       <Route path="/forum" element={<Forum />} />
+
+      {/* Phase 10: In-Browser Coding Assessment */}
+      <Route path="/assessment" element={<CodingAssessment />} />
+
+      {/* Phase 11: Real-Time Direct Messaging */}
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <Messages />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Phase 12: Predictive Placement Analytics */}
+      <Route path="/analytics" element={<Analytics />} />
 
       {/* Corporate Recruiter Portal */}
       <Route
@@ -134,6 +154,7 @@ function AppShell() {
       <main className={isProfilePage ? "aicte-full-screen" : "container"}>
         <AppRoutes />
       </main>
+      <CampusBot />
       <Toaster
         position="top-right"
         toastOptions={{

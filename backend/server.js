@@ -38,6 +38,10 @@ const interviewRoutes = require('./routes/interviews');
 const evaluationRoutes = require('./routes/evaluations');
 const recruiterRoutes = require('./routes/recruiter');
 const forumRoutes = require('./routes/forum');
+const assistantRoutes = require('./routes/assistant');
+const assessmentRoutes = require('./routes/assessment');
+const messageRoutes = require('./routes/messages');
+const adminBatchRoutes = require('./routes/adminBatch');
 
 app.use('/api/auth', authRoutes);             // /api/auth/register, /api/auth/login
 app.use('/api/jobs', jobRoutes);              // /api/jobs (list, create, detail)
@@ -49,6 +53,10 @@ app.use('/api/interviews', interviewRoutes);   // /api/interviews (schedule, lis
 app.use('/api/evaluations', evaluationRoutes); // /api/evaluations (candidate scorecard)
 app.use('/api/recruiter', recruiterRoutes);   // /api/recruiter (corporate portal)
 app.use('/api/forum', forumRoutes);           // /api/forum (bulletin board & Q&A)
+app.use('/api/assistant', assistantRoutes);   // /api/assistant (CampusBot AI Copilot)
+app.use('/api/assessment', assessmentRoutes); // /api/assessment (In-browser coding test)
+app.use('/api/messages', messageRoutes);       // /api/messages (1-on-1 direct chat)
+app.use('/api/admin', adminBatchRoutes);      // /api/admin/import-students (batch CSV importer)
 
 // ---- Health Check Route (Test karne ke liye) ----
 app.get('/', (req, res) => {

@@ -80,4 +80,21 @@ export const deleteAnnouncement = (id) => API.delete(`/forum/announcements/${id}
 export const getDriveDiscussions = (jobId) => API.get(`/forum/discussions/${jobId}`);
 export const postDriveDiscussion = (jobId, data) => API.post(`/forum/discussions/${jobId}`, data);
 
+// ---- Phase 9: CampusBot AI Copilot API ----
+export const sendChatMessage = (message) => API.post('/assistant/chat', { message });
+
+// ---- Phase 10: In-Browser Coding Assessment APIs ----
+export const getCodingProblems = () => API.get('/assessment/problems');
+export const submitCodingAssessment = (data) => API.post('/assessment/submit', data);
+export const getMySubmissions = () => API.get('/assessment/my');
+
+// ---- Phase 11: 1-on-1 Direct Messaging APIs ----
+export const sendDirectMessage = (data) => API.post('/messages', data);
+export const getChatThread = (otherUserId) => API.get(`/messages/thread/${otherUserId}`);
+export const getConversations = () => API.get('/messages/conversations');
+
+// ---- Phase 13: Bulk Student Batch Importer & Google SSO ----
+export const importStudentBatch = (students) => API.post('/admin/import-students', { students });
+export const googleSsoLogin = (data) => API.post('/auth/google-sso', data);
+
 export default API;

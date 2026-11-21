@@ -1,8 +1,9 @@
 // src/pages/admin/AdminDashboard.jsx — Placement Intelligence & KPI Analytics
 import { useState, useEffect, useMemo } from 'react';
-import { getStats } from '../../services/api';
+import { getStats, importStudentBatch } from '../../services/api';
 import CompanyLogo from '../../components/CompanyLogo';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import {
   FaChartBar,
   FaUsers,
@@ -21,7 +22,8 @@ import {
   FaTimes,
   FaUniversity,
   FaAward,
-  FaDownload
+  FaDownload,
+  FaFileUpload
 } from 'react-icons/fa';
 
 export default function AdminDashboard() {
@@ -29,6 +31,55 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [companySearch, setCompanySearch] = useState('');
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [csvText, setCsvText] = useState(
+    "name,email,department,cgpa\nAarav Sharma,aarav@campus.edu,CSE,8.85\nPriya Patel,priya@campus.edu,IT,9.12\nRohan Gupta,rohan@campus.edu,ECE,7.95\nSneha Reddy,sneha@campus.edu,CSE,8.40"
+  );
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+
+  const handleBulkImport = async () => {
+    if (!csvText.trim()) return;
+    setImporting(true);
+    setImportResult(null);
+
+    try {
+      const lines = csvText.trim().split('\n');
+      const students = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        if (i === 0 && (line.toLowerCase().includes('email') || line.toLowerCase().includes('name'))) {
+          continue; // skip header
+        }
+
+        const parts = line.split(',').map((p) => p.trim());
+        if (parts.length >= 2) {
+          students.push({
+            name: parts[0],
+            email: parts[1],
+            department: parts[2] || 'CSE',
+            cgpa: parts[3] ? parseFloat(parts[3]) : null
+          });
+        }
+      }
+
+      if (students.length === 0) {
+        toast.error('No valid student rows found in CSV');
+        setImporting(false);
+        return;
+      }
+
+      const { data } = await importStudentBatch(students);
+      setImportResult(data);
+      toast.success(`Import complete! ${data.inserted} added.`);
+    } catch (err) {
+      toast.error('Import failed: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setImporting(false);
+    }
+  };
 
   useEffect(() => {
     getStats()
@@ -68,6 +119,26 @@ export default function AdminDashboard() {
 
         {/* Quick Nav Buttons */}
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => setShowImportModal(true)}
+            style={{
+              background: '#fef3c7',
+              border: '1.5px solid #fde047',
+              color: '#b45309',
+              padding: '0.6rem 1.2rem',
+              borderRadius: '10px',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              boxShadow: '0 2px 6px rgba(180, 83, 9, 0.08)'
+            }}
+          >
+            <FaFileUpload style={{ color: '#d97706' }} /> Bulk Student Import (CSV)
+          </button>
           <button
             type="button"
             onClick={() => setShowReportModal(true)}
@@ -592,6 +663,150 @@ export default function AdminDashboard() {
                   This official document is generated via the CampusConnect Enterprise Recruitment System. All statistics are cryptographically logged and authenticated for institutional accreditations including NAAC, NIRF, NBA, and AICTE mandatory disclosures.
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Phase 13: Bulk Student CSV Importer Modal */}
+      {showImportModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(15, 23, 42, 0.7)',
+            backdropFilter: 'blur(4px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem'
+          }}
+        >
+          <div
+            style={{
+              background: '#ffffff',
+              borderRadius: '20px',
+              padding: '2rem',
+              maxWidth: '620px',
+              width: '100%',
+              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <div
+                  style={{
+                    background: '#fef3c7',
+                    color: '#d97706',
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '1.2rem'
+                  }}
+                >
+                  <FaFileUpload />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
+                    Bulk Student Batch Importer
+                  </h3>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>
+                    Import hundreds of eligible students into CampusConnect database
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowImportModal(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: '1.2rem',
+                  color: '#94a3b8',
+                  cursor: 'pointer'
+                }}
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.86rem', color: '#475569', lineHeight: 1.5, margin: '0 0 0.85rem' }}>
+              Paste comma-separated student rows (<code>name, email, department, cgpa</code>). Each candidate will be assigned an automated account with default temporary password (<code>Student@123</code>).
+            </p>
+
+            <textarea
+              rows={8}
+              value={csvText}
+              onChange={(e) => setCsvText(e.target.value)}
+              placeholder="name,email,department,cgpa&#10;Aarav Sharma,aarav@campus.edu,CSE,8.85"
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                borderRadius: '12px',
+                border: '1.5px solid #cbd5e1',
+                fontFamily: 'Consolas, monospace',
+                fontSize: '0.88rem',
+                lineHeight: 1.5,
+                outline: 'none',
+                boxSizing: 'border-box',
+                marginBottom: '1rem'
+              }}
+            />
+
+            {importResult && (
+              <div
+                style={{
+                  background: '#f0fdf4',
+                  border: '1px solid #bbf7d0',
+                  color: '#15803d',
+                  padding: '0.85rem 1rem',
+                  borderRadius: '10px',
+                  fontSize: '0.88rem',
+                  marginBottom: '1rem'
+                }}
+              >
+                <strong>✅ Import Summary:</strong> {importResult.inserted} students registered successfully!
+                {importResult.skipped > 0 && ` (${importResult.skipped} already registered / skipped)`}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+              <button
+                type="button"
+                onClick={() => setShowImportModal(false)}
+                style={{
+                  background: '#f1f5f9',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '9px 18px',
+                  fontWeight: 700,
+                  color: '#475569',
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={handleBulkImport}
+                disabled={importing || !csvText.trim()}
+                style={{
+                  background: '#ea580c',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '9px 22px',
+                  fontWeight: 700,
+                  color: '#ffffff',
+                  cursor: importing ? 'wait' : 'pointer'
+                }}
+              >
+                {importing ? 'Processing Batch...' : 'Import Students Now'}
+              </button>
             </div>
           </div>
         </div>
