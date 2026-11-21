@@ -21,24 +21,31 @@ router.post('/', verifyToken, async (req, res) => {
     );
 
     // Send in-app notification to receiver
-    await sendNotification(
-      receiver_id,
-      `💬 New Message from ${req.user.name}`,
-      message.slice(0, 100) + (message.length > 100 ? '...' : ''),
-      'message',
-      '/messages'
-    );
+    try {
+      await sendNotification(
+        receiver_id,
+        `💬 New Message from ${req.user.name}`,
+        message.slice(0, 100) + (message.length > 100 ? '...' : ''),
+        'message',
+        '/messages'
+      );
+    } catch (notifErr) {
+      // Non-blocking notification fail
+    }
+
+    const newMsg = {
+      id: result.insertId,
+      sender_id: req.user.id,
+      receiver_id: Number(receiver_id),
+      message: message.trim(),
+      is_read: false,
+      created_at: new Date()
+    };
 
     res.status(201).json({
       message: '✅ Message delivered successfully',
-      messageId: result.insertId,
-      data: {
-        id: result.insertId,
-        sender_id: req.user.id,
-        receiver_id: Number(receiver_id),
-        message: message.trim(),
-        created_at: new Date()
-      }
+      ...newMsg,
+      data: newMsg
     });
   } catch (err) {
     res.status(500).json({ message: 'Error sending message', error: err.message });
@@ -48,6 +55,10 @@ router.post('/', verifyToken, async (req, res) => {
 // ---- GET /api/messages/thread/:otherUserId — Chat history with specific user ----
 router.get('/thread/:otherUserId', verifyToken, async (req, res) => {
   const otherId = req.params.otherUserId;
+
+  if (!otherId || otherId === 'undefined' || isNaN(Number(otherId))) {
+    return res.json([]);
+  }
 
   try {
     const [messages] = await db.query(
@@ -69,7 +80,7 @@ router.get('/thread/:otherUserId', verifyToken, async (req, res) => {
       [otherId, req.user.id]
     );
 
-    res.json({ messages });
+    res.json(messages);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching chat thread', error: err.message });
   }
@@ -78,32 +89,44 @@ router.get('/thread/:otherUserId', verifyToken, async (req, res) => {
 // ---- GET /api/messages/conversations — Get all active conversations ----
 router.get('/conversations', verifyToken, async (req, res) => {
   try {
-    const [rows] = await db.query(
+    // 1. Fetch previous conversation partners with last message and unread count
+    const [existing] = await db.query(
       `SELECT DISTINCT
-         u.id as user_id,
-         u.name as user_name,
-         u.email as user_email,
-         u.role as user_role,
-         u.company_name
+         u.id,
+         u.name,
+         u.email,
+         u.role,
+         u.company_name,
+         (SELECT COUNT(*) FROM direct_messages WHERE sender_id = u.id AND receiver_id = ? AND is_read = FALSE) as unread_count,
+         (SELECT message FROM direct_messages WHERE (sender_id = u.id AND receiver_id = ?) OR (sender_id = ? AND receiver_id = u.id) ORDER BY created_at DESC LIMIT 1) as last_message
        FROM users u
        WHERE u.id IN (
          SELECT DISTINCT receiver_id FROM direct_messages WHERE sender_id = ?
          UNION
          SELECT DISTINCT sender_id FROM direct_messages WHERE receiver_id = ?
        )`,
-      [req.user.id, req.user.id]
+      [req.user.id, req.user.id, req.user.id, req.user.id, req.user.id]
     );
 
-    // If list is empty, return default institutional contacts (Admins & Recruiters)
-    let contacts = rows;
-    if (contacts.length === 0) {
-      const [defaults] = await db.query(
-        "SELECT id as user_id, name as user_name, email as user_email, role as user_role, company_name FROM users WHERE role IN ('admin', 'recruiter') LIMIT 5"
-      );
-      contacts = defaults;
+    // 2. Fetch other potential contacts (TPO Admins, Recruiters, and peers) so new chats can start
+    const [otherContacts] = await db.query(
+      `SELECT id, name, email, role, company_name, 0 as unread_count, NULL as last_message 
+       FROM users 
+       WHERE id != ? 
+       ORDER BY role = 'admin' DESC, role = 'recruiter' DESC, name ASC 
+       LIMIT 25`,
+      [req.user.id]
+    );
+
+    const existingIds = new Set(existing.map((u) => u.id));
+    const combined = [...existing];
+    for (const c of otherContacts) {
+      if (!existingIds.has(c.id)) {
+        combined.push(c);
+      }
     }
 
-    res.json({ conversations: contacts });
+    res.json(combined);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching conversations', error: err.message });
   }

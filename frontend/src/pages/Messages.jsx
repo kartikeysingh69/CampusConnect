@@ -30,9 +30,10 @@ export default function Messages() {
   const loadConversations = async (keepActive = true) => {
     try {
       const { data } = await getConversations();
-      setConversations(data);
-      if (!keepActive && data.length > 0 && !activeUser) {
-        selectUser(data[0]);
+      const list = Array.isArray(data) ? data : (data?.conversations || []);
+      setConversations(list);
+      if (!keepActive && list.length > 0 && !activeUser) {
+        selectUser(list[0]);
       }
     } catch (err) {
       // ignore poll errors
@@ -51,14 +52,15 @@ export default function Messages() {
 
   // When activeUser changes, fetch thread
   useEffect(() => {
-    if (!activeUser) return;
+    if (!activeUser || !activeUser.id) return;
     let isCurrent = true;
 
     const fetchThread = async () => {
       try {
         const { data } = await getChatThread(activeUser.id);
+        const list = Array.isArray(data) ? data : (data?.messages || []);
         if (isCurrent) {
-          setMessages(data);
+          setMessages(list);
         }
       } catch (err) {
         // error
@@ -87,7 +89,7 @@ export default function Messages() {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!inputText.trim() || !activeUser || sending) return;
+    if (!inputText.trim() || !activeUser || !activeUser.id || sending) return;
 
     const text = inputText.trim();
     setInputText('');
@@ -98,7 +100,8 @@ export default function Messages() {
         receiver_id: activeUser.id,
         message: text
       });
-      setMessages((prev) => [...prev, data]);
+      const newMsg = data.data || data;
+      setMessages((prev) => [...(Array.isArray(prev) ? prev : []), newMsg]);
       loadConversations(true);
     } catch (err) {
       toast.error('Failed to send message');
@@ -108,10 +111,10 @@ export default function Messages() {
     }
   };
 
-  const filteredConversations = conversations.filter(
+  const filteredConversations = (Array.isArray(conversations) ? conversations : []).filter(
     (c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.email.toLowerCase().includes(searchTerm.toLowerCase())
+      c?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c?.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getRoleIcon = (role) => {
@@ -380,12 +383,12 @@ export default function Messages() {
                   <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
                     Loading message history...
                   </div>
-                ) : messages.length === 0 ? (
+                ) : (!messages || messages.length === 0) ? (
                   <div style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>
                     No messages yet. Send a message to start the conversation!
                   </div>
                 ) : (
-                  messages.map((m) => {
+                  (Array.isArray(messages) ? messages : []).map((m) => {
                     const isMe = m.sender_id === user.id;
                     return (
                       <div

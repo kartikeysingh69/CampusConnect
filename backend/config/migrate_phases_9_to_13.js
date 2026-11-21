@@ -34,7 +34,7 @@ async function runMigration() {
       CREATE TABLE IF NOT EXISTS assessment_submissions (
         id INT AUTO_INCREMENT PRIMARY KEY,
         student_id INT NOT NULL,
-        job_id INT NOT NULL,
+        job_id INT DEFAULT NULL,
         problem_title VARCHAR(255) NOT NULL,
         language VARCHAR(50) NOT NULL,
         code_submitted TEXT NOT NULL,
