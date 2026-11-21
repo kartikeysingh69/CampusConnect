@@ -25,7 +25,8 @@ import {
   FaCalendarCheck,
   FaAward,
   FaVideo,
-  FaDownload
+  FaDownload,
+  FaLaptopCode
 } from 'react-icons/fa';
 
 const statusConfig = {
@@ -157,24 +158,45 @@ export default function MyApplications() {
             Real-time status tracker, stage updates, and management for campus recruitment drives
           </p>
         </div>
-        <Link
-          to="/jobs"
-          style={{
-            background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-            color: '#ffffff',
-            padding: '0.65rem 1.3rem',
-            borderRadius: '10px',
-            textDecoration: 'none',
-            fontSize: '0.9rem',
-            fontWeight: 700,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            boxShadow: '0 4px 14px rgba(234, 88, 12, 0.25)'
-          }}
-        >
-          Explore More Drives <FaArrowRight style={{ fontSize: '0.8rem' }} />
-        </Link>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <Link
+            to="/assessment"
+            style={{
+              background: '#fef3c7',
+              border: '1.5px solid #fde047',
+              color: '#b45309',
+              padding: '0.65rem 1.3rem',
+              borderRadius: '10px',
+              textDecoration: 'none',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              boxShadow: '0 2px 6px rgba(180, 83, 9, 0.08)'
+            }}
+          >
+            <FaLaptopCode /> Take Coding Assessment
+          </Link>
+          <Link
+            to="/jobs"
+            style={{
+              background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+              color: '#ffffff',
+              padding: '0.65rem 1.3rem',
+              borderRadius: '10px',
+              textDecoration: 'none',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              boxShadow: '0 4px 14px rgba(234, 88, 12, 0.25)'
+            }}
+          >
+            Explore More Drives <FaArrowRight style={{ fontSize: '0.8rem' }} />
+          </Link>
+        </div>
       </div>
 
       {/* KPI Metric Cards */}

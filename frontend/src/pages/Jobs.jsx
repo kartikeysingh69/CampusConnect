@@ -1,6 +1,6 @@
 // src/pages/Jobs.jsx — Browse placement drives with Company Logos, Multi-Stream Filters & Auto-Shuffle on refresh
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getJobs, getProfile } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { calculateSkillMatch } from '../utils/skillMatcher';
@@ -68,6 +68,19 @@ export default function Jobs() {
 
   // Mobile drawer state
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const branchParam = searchParams.get('branch') || searchParams.get('stream');
+    const searchParam = searchParams.get('search');
+    if (branchParam) {
+      const match = STREAMS.find((s) => s.toLowerCase().includes(branchParam.toLowerCase()));
+      setSelectedStreams([match || branchParam]);
+    }
+    if (searchParam) {
+      setSearch(searchParam);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     getJobs()

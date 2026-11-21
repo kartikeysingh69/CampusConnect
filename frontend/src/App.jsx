@@ -22,6 +22,7 @@ import CodingAssessment from './pages/CodingAssessment';
 import Messages from './pages/Messages';
 import Analytics from './pages/Analytics';
 import CampusBot from './components/CampusBot';
+import LandingHome from './pages/LandingHome';
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -123,21 +124,8 @@ function AppRoutes() {
         }
       />
 
-      {/* Default redirect to Role-Specific Home */}
-      <Route
-        path="/"
-        element={
-          <Navigate
-            to={
-              user?.role === 'admin'
-                ? '/admin'
-                : user?.role === 'recruiter'
-                ? '/recruiter'
-                : '/jobs'
-            }
-          />
-        }
-      />
+      {/* Flagship Front Page / Landing Home */}
+      <Route path="/" element={<LandingHome />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
@@ -146,12 +134,13 @@ function AppRoutes() {
 function AppShell() {
   const location = useLocation();
   const isProfilePage = location.pathname === '/profile';
+  const isLandingPage = location.pathname === '/';
 
   return (
     <>
       <Background3D />
       <Navbar />
-      <main className={isProfilePage ? "aicte-full-screen" : "container"}>
+      <main className={isProfilePage || isLandingPage ? "aicte-full-screen" : "container"}>
         <AppRoutes />
       </main>
       <CampusBot />
