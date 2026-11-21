@@ -28,9 +28,19 @@ export default function Navbar() {
           <>
             {user.role === 'student' && (
               <>
-                <Link to="/jobs">Jobs</Link>
+                <Link to="/jobs">Drives</Link>
                 <Link to="/my-applications">My Applications</Link>
+                <Link to="/ats-checker" style={{ color: '#ea580c', fontWeight: 700 }}>AI ATS</Link>
+                <Link to="/mock-prep">Prep Q&A</Link>
+                <Link to="/forum">TPO Bulletin</Link>
                 <Link to="/profile">Profile</Link>
+              </>
+            )}
+            {user.role === 'recruiter' && (
+              <>
+                <Link to="/recruiter" style={{ color: '#ea580c', fontWeight: 800 }}>Recruiter Portal</Link>
+                <Link to="/jobs">Browse Drives</Link>
+                <Link to="/forum">TPO Bulletin</Link>
               </>
             )}
             {user.role === 'admin' && (
@@ -38,6 +48,7 @@ export default function Navbar() {
                 <Link to="/admin">Dashboard</Link>
                 <Link to="/admin/jobs">Manage Jobs</Link>
                 <Link to="/admin/applications">Applications</Link>
+                <Link to="/forum">TPO Bulletin</Link>
               </>
             )}
 
@@ -45,7 +56,7 @@ export default function Navbar() {
             <NotificationBell />
 
             <span className="user-badge">
-              <FaUser /> {user.name} ({user.role})
+              <FaUser /> {user.name} ({user.company_name ? `${user.company_name} HR` : user.role})
             </span>
             <button onClick={handleLogout} className="btn-logout">
               <FaSignOutAlt /> Logout
@@ -54,6 +65,8 @@ export default function Navbar() {
         ) : (
           <>
             <Link to="/jobs">Explore Jobs</Link>
+            <Link to="/mock-prep">Interview Prep</Link>
+            <Link to="/forum">TPO Bulletin</Link>
             <Link to="/login">Login</Link>
             <Link to="/register">Register</Link>
           </>

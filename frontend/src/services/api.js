@@ -65,4 +65,19 @@ export const deleteResume = () => API.delete('/profile/resume');
 // ---- Stats API ----
 export const getStats = () => API.get('/stats');
 
+// ---- Recruiter & Evaluation APIs (Phase 4) ----
+export const getRecruiterDrives = () => API.get('/recruiter/my-drives');
+export const getRecruiterApplications = () => API.get('/recruiter/applications');
+export const postRecruiterDrive = (data) => API.post('/recruiter/post-drive', data);
+export const getRecruiterStats = () => API.get('/recruiter/stats');
+export const submitEvaluation = (data) => API.post('/evaluations', data);
+export const getEvaluation = (appId) => API.get(`/evaluations/${appId}`);
+
+// ---- Forum & Bulletin Board APIs (Phase 7) ----
+export const getAnnouncements = () => API.get('/forum/announcements');
+export const createAnnouncement = (data) => API.post('/forum/announcements', data);
+export const deleteAnnouncement = (id) => API.delete(`/forum/announcements/${id}`);
+export const getDriveDiscussions = (jobId) => API.get(`/forum/discussions/${jobId}`);
+export const postDriveDiscussion = (jobId, data) => API.post(`/forum/discussions/${jobId}`, data);
+
 export default API;

@@ -14,6 +14,10 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageJobs from './pages/admin/ManageJobs';
 import ReviewApplications from './pages/admin/ReviewApplications';
+import RecruiterDashboard from './pages/recruiter/RecruiterDashboard';
+import AtsChecker from './pages/AtsChecker';
+import MockInterview from './pages/MockInterview';
+import Forum from './pages/Forum';
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -47,6 +51,32 @@ function AppRoutes() {
         }
       />
 
+      {/* AI Resume ATS Checker */}
+      <Route
+        path="/ats-checker"
+        element={
+          <ProtectedRoute>
+            <AtsChecker />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* AI Mock Interview & Viva Simulator */}
+      <Route path="/mock-prep" element={<MockInterview />} />
+
+      {/* TPO Bulletin & Drive Q&A Forum */}
+      <Route path="/forum" element={<Forum />} />
+
+      {/* Corporate Recruiter Portal */}
+      <Route
+        path="/recruiter"
+        element={
+          <ProtectedRoute>
+            <RecruiterDashboard />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Admin Protected Routes */}
       <Route
         path="/admin"
@@ -73,10 +103,20 @@ function AppRoutes() {
         }
       />
 
-      {/* Default redirect to Jobs or Admin */}
+      {/* Default redirect to Role-Specific Home */}
       <Route
         path="/"
-        element={<Navigate to={user?.role === 'admin' ? '/admin' : '/jobs'} />}
+        element={
+          <Navigate
+            to={
+              user?.role === 'admin'
+                ? '/admin'
+                : user?.role === 'recruiter'
+                ? '/recruiter'
+                : '/jobs'
+            }
+          />
+        }
       />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

@@ -6,6 +6,7 @@ const router = express.Router();
 const db = require('../config/db');
 const verifyToken = require('../middleware/auth');
 const { sendNotification } = require('./notifications');
+const { sendOfferLetterEmail } = require('../utils/emailService');
 
 // ---- POST Apply for a job (Student) ----
 // URL: POST http://localhost:5000/api/applications
@@ -209,16 +210,18 @@ router.patch('/:id/status', verifyToken, async (req, res) => {
 // ---- POST Issue / Release Offer Letter (Admin only) ----
 // URL: POST http://localhost:5000/api/applications/:id/offer
 router.post('/:id/offer', verifyToken, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Only admins can issue offer letters' });
+  if (req.user.role !== 'admin' && req.user.role !== 'recruiter') {
+    return res.status(403).json({ message: 'Only admins and recruiters can issue offer letters' });
   }
 
   const { offered_ctc, joining_date, offer_letter_url } = req.body;
 
   try {
     const [apps] = await db.query(
-      `SELECT a.student_id, j.title, j.company 
-       FROM applications a JOIN jobs j ON a.job_id = j.id 
+      `SELECT a.student_id, u.name as student_name, u.email as student_email, j.title, j.company 
+       FROM applications a 
+       JOIN users u ON a.student_id = u.id
+       JOIN jobs j ON a.job_id = j.id 
        WHERE a.id = ?`,
       [req.params.id]
     );
@@ -226,6 +229,8 @@ router.post('/:id/offer', verifyToken, async (req, res) => {
     if (apps.length === 0) {
       return res.status(404).json({ message: 'Application not found' });
     }
+
+    const app = apps[0];
 
     await db.query(
       `UPDATE applications SET 
@@ -237,16 +242,22 @@ router.post('/:id/offer', verifyToken, async (req, res) => {
       [offered_ctc, joining_date, offer_letter_url, req.params.id]
     );
 
-    const app = apps[0];
-    await sendNotification({
-      userId: app.student_id,
-      title: `📜 Official Offer Released: ${app.company}`,
-      message: `Your official offer letter for ${app.title} (${offered_ctc || 'As per norms'}) has been issued! You can download it directly from My Applications.`,
-      type: 'status_update',
-      link: '/my-applications'
-    });
+    await sendNotification(
+      app.student_id,
+      `📜 Official Offer Released: ${app.company}`,
+      `Your official offer letter for ${app.title} (${offered_ctc || 'As per norms'}) has been issued! You can download it directly from My Applications. Check your email for formal acceptance details.`,
+      'status_update',
+      '/my-applications'
+    );
 
-    res.json({ message: '✅ Official Offer Letter released and student notified!' });
+    // Send celebratory formal offer letter email
+    sendOfferLetterEmail(
+      { name: app.student_name, email: app.student_email },
+      { title: app.title, company: app.company },
+      { offered_ctc, joining_date, offer_letter_url }
+    ).catch((e) => console.warn('Offer letter email background dispatch error:', e.message));
+
+    res.json({ message: '✅ Official Offer Letter released, student notified & confirmation email dispatched!' });
   } catch (err) {
     res.status(500).json({ message: 'Error issuing offer letter', error: err.message });
   }

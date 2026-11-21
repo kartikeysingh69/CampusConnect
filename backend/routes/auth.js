@@ -7,10 +7,10 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
-// ---- REGISTER (New Student ya Admin Account Banana) ----
+// ---- REGISTER (New Student, Admin ya Recruiter Account Banana) ----
 // URL: POST http://localhost:5000/api/auth/register
 router.post('/register', async (req, res) => {
-  const { name, email, password, role = 'student', employee_id } = req.body;
+  const { name, email, password, role = 'student', employee_id, company_name } = req.body;
 
   if (!name || !email || !password) {
     return res.status(400).json({ message: 'All fields are required' });
@@ -19,6 +19,11 @@ router.post('/register', async (req, res) => {
   // Admin registration requires a valid Employee ID (placement cell staff only)
   if (role === 'admin' && (!employee_id || String(employee_id).trim() === '')) {
     return res.status(400).json({ message: 'Employee ID is required for admin registration' });
+  }
+
+  // Recruiter registration requires Company Name
+  if (role === 'recruiter' && (!company_name || String(company_name).trim() === '')) {
+    return res.status(400).json({ message: 'Company Name is required for Recruiter registration' });
   }
 
   try {
@@ -33,8 +38,15 @@ router.post('/register', async (req, res) => {
 
     // Database me save karo
     const [result] = await db.query(
-      'INSERT INTO users (name, email, password, role, employee_id) VALUES (?, ?, ?, ?, ?)',
-      [name, email, hashedPassword, role, role === 'admin' ? employee_id.trim() : null]
+      'INSERT INTO users (name, email, password, role, employee_id, company_name) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        name,
+        email,
+        hashedPassword,
+        role,
+        role === 'admin' ? employee_id.trim() : null,
+        role === 'recruiter' ? company_name.trim() : null
+      ]
     );
 
     res.status(201).json({
@@ -72,7 +84,13 @@ router.post('/login', async (req, res) => {
 
     // JWT Token generate karo (24 ghante ke liye valid)
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role, name: user.name },
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        company_name: user.company_name
+      },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -80,7 +98,13 @@ router.post('/login', async (req, res) => {
     res.json({
       message: '✅ Login successful!',
       token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        company_name: user.company_name
+      }
     });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });

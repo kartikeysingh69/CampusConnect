@@ -4,12 +4,13 @@ const router = express.Router();
 const db = require('../config/db');
 const verifyToken = require('../middleware/auth');
 const { sendNotification } = require('./notifications');
+const { sendInterviewInviteEmail } = require('../utils/emailService');
 
-// ---- POST Schedule an interview round (Admin only) ----
+// ---- POST Schedule an interview round (Admin ya Recruiter) ----
 // URL: POST http://localhost:5000/api/interviews
 router.post('/', verifyToken, async (req, res) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ message: 'Only admins can schedule interviews' });
+  if (req.user.role !== 'admin' && req.user.role !== 'recruiter') {
+    return res.status(403).json({ message: 'Only admins and recruiters can schedule interviews' });
   }
 
   const {
@@ -30,8 +31,9 @@ router.post('/', verifyToken, async (req, res) => {
   try {
     // Fetch student & job details for the application
     const [apps] = await db.query(
-      `SELECT a.student_id, j.title, j.company 
+      `SELECT a.student_id, u.email as student_email, u.name as student_name, j.title, j.company 
        FROM applications a
+       JOIN users u ON a.student_id = u.id
        JOIN jobs j ON a.job_id = j.id
        WHERE a.id = ?`,
       [application_id]
@@ -41,7 +43,7 @@ router.post('/', verifyToken, async (req, res) => {
       return res.status(404).json({ message: 'Application not found' });
     }
 
-    const { student_id, title, company } = apps[0];
+    const { student_id, student_email, student_name, title, company } = apps[0];
 
     // Insert interview record
     const [result] = await db.query(
@@ -68,16 +70,23 @@ router.post('/', verifyToken, async (req, res) => {
 
     // Send automatic in-app notification to student
     const dateFormatted = new Date(scheduled_date).toLocaleString();
-    await sendNotification({
-      userId: student_id,
-      title: `📅 Interview Scheduled: ${company}`,
-      message: `You have been scheduled for "${round_name}" (${round_type || 'Technical'}) on ${dateFormatted}. Mode: ${mode || 'Online'}.`,
-      type: 'interview_scheduled',
-      link: '/my-applications'
-    });
+    await sendNotification(
+      student_id,
+      `📅 Interview Scheduled: ${company}`,
+      `You have been scheduled for "${round_name}" (${round_type || 'Technical'}) on ${dateFormatted}. Mode: ${mode || 'Online'}. Check calendar invite in your email!`,
+      'interview_scheduled',
+      '/my-applications'
+    );
+
+    // Send automated email invite with .ics Google/Outlook Calendar attachment
+    sendInterviewInviteEmail(
+      { name: student_name, email: student_email },
+      { title, company },
+      { round_name, round_type, scheduled_date, duration_minutes, mode, location_or_link, notes }
+    ).catch((e) => console.warn('Email dispatch background error:', e.message));
 
     res.status(201).json({
-      message: '✅ Interview scheduled successfully and notification sent to student!',
+      message: '✅ Interview scheduled successfully, calendar invite & email sent to candidate!',
       interviewId: result.insertId
     });
   } catch (err) {

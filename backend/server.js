@@ -35,6 +35,9 @@ const profileRoutes = require('./routes/profile');
 const statsRoutes = require('./routes/stats');
 const { router: notificationRoutes } = require('./routes/notifications');
 const interviewRoutes = require('./routes/interviews');
+const evaluationRoutes = require('./routes/evaluations');
+const recruiterRoutes = require('./routes/recruiter');
+const forumRoutes = require('./routes/forum');
 
 app.use('/api/auth', authRoutes);             // /api/auth/register, /api/auth/login
 app.use('/api/jobs', jobRoutes);              // /api/jobs (list, create, detail)
@@ -43,6 +46,9 @@ app.use('/api/profile', profileRoutes);       // /api/profile (get, update)
 app.use('/api/stats', statsRoutes);           // /api/stats (admin dashboard)
 app.use('/api/notifications', notificationRoutes); // /api/notifications (get, read)
 app.use('/api/interviews', interviewRoutes);   // /api/interviews (schedule, list)
+app.use('/api/evaluations', evaluationRoutes); // /api/evaluations (candidate scorecard)
+app.use('/api/recruiter', recruiterRoutes);   // /api/recruiter (corporate portal)
+app.use('/api/forum', forumRoutes);           // /api/forum (bulletin board & Q&A)
 
 // ---- Health Check Route (Test karne ke liye) ----
 app.get('/', (req, res) => {
