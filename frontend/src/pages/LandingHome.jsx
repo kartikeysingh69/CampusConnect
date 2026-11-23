@@ -395,18 +395,21 @@ export default function LandingHome() {
                 width: '100%'
               }}
             >
-              <img
-                src="/hero-candidates-standing.png"
-                alt="CampusConnect Formal Candidates with Laptop and Placement Dossier"
-                style={{
-                  width: '100%',
-                  maxWidth: '520px',
-                  height: 'auto',
-                  maxHeight: '440px',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5))'
-                }}
-              />
+              <picture style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                <source srcSet="/hero-students-authentic.webp" type="image/webp" />
+                <img
+                  src="/hero-candidates-standing.png"
+                  alt="CampusConnect Formal Candidates with Laptop and Placement Offer Documents"
+                  style={{
+                    width: '100%',
+                    maxWidth: '560px',
+                    height: 'auto',
+                    maxHeight: '460px',
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.45))'
+                  }}
+                />
+              </picture>
 
               {/* Floating Verified Achievement Pill */}
               <div
