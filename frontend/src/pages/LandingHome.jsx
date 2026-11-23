@@ -27,7 +27,9 @@ import {
   FaUserGraduate,
   FaCode,
   FaDownload,
-  FaPaperPlane
+  FaPaperPlane,
+  FaAward,
+  FaBook
 } from 'react-icons/fa';
 
 export default function LandingHome() {
@@ -356,95 +358,319 @@ export default function LandingHome() {
             </div>
           </div>
 
-          {/* Right Hero Visual: Boy and Girl Students Illustration (Warm Lighting) */}
+          {/* Right Hero Visual: Formal Male & Female Candidates with Laptop and Placement Book */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'flex-end',
-              position: 'relative'
+              alignItems: 'center',
+              position: 'relative',
+              width: '100%',
+              maxWidth: '560px'
             }}
           >
+            {/* Ambient Warm Orange Glow */}
             <div
               style={{
+                position: 'absolute',
+                width: '380px',
+                height: '380px',
+                background: 'radial-gradient(circle, rgba(234, 88, 12, 0.35) 0%, rgba(249, 115, 22, 0.15) 50%, transparent 70%)',
+                filter: 'blur(35px)',
+                zIndex: 0,
+                pointerEvents: 'none'
+              }}
+            />
+
+            {/* Main Stage Container with Dual Candidate Showcase */}
+            <div
+              style={{
+                position: 'relative',
+                zIndex: 1,
                 width: '100%',
-                maxWidth: '460px',
-                borderRadius: '24px',
-                background: 'radial-gradient(circle at 50% 60%, rgba(234, 88, 12, 0.25) 0%, transparent 70%)',
-                padding: '1.5rem 1rem 0',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center'
               }}
             >
-              <svg
-                viewBox="0 0 500 420"
-                style={{ width: '100%', height: 'auto', filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.35))' }}
+              {/* Floating Top Badge */}
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  background: 'rgba(15, 23, 42, 0.9)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(251, 146, 60, 0.4)',
+                  padding: '0.45rem 1rem',
+                  borderRadius: '9999px',
+                  color: '#ffedd5',
+                  fontSize: '0.78rem',
+                  fontWeight: '700',
+                  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
+                  marginBottom: '1rem',
+                  letterSpacing: '0.3px'
+                }}
               >
-                {/* Background decorative warm soft shapes */}
-                <circle cx="250" cy="200" r="160" fill="#ea580c" opacity="0.22" />
-                <circle cx="160" cy="180" r="110" fill="#f97316" opacity="0.28" />
+                <span
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#22c55e',
+                    boxShadow: '0 0 10px #22c55e'
+                  }}
+                />
+                <span>CAMPUS CONNECT • 100% VERIFIED PLACEMENT SUCCESS</span>
+              </div>
 
-                {/* GIRL (Left): White formal shirt, holding modern laptop */}
-                <g id="girl-student">
-                  {/* Hair */}
-                  <path
-                    d="M 120 130 C 110 80, 210 70, 210 130 C 220 190, 200 230, 215 270 C 190 280, 110 270, 115 230 Z"
-                    fill="#1e1b4b"
-                  />
-                  {/* Face */}
-                  <ellipse cx="165" cy="140" rx="36" ry="44" fill="#fed7aa" />
-                  {/* Smile & Eyes */}
-                  <path d="M 152 152 Q 165 164 178 152" stroke="#9a3412" strokeWidth="3" fill="none" strokeLinecap="round" />
-                  <ellipse cx="152" cy="132" rx="4" ry="5" fill="#451a03" />
-                  <ellipse cx="178" cy="132" rx="4" ry="5" fill="#451a03" />
-                  {/* Eyebrows */}
-                  <path d="M 146 122 Q 152 118 158 122" stroke="#451a03" strokeWidth="2.5" fill="none" />
-                  <path d="M 172 122 Q 178 118 184 122" stroke="#451a03" strokeWidth="2.5" fill="none" />
-                  {/* White Collared Shirt */}
-                  <path d="M 125 210 L 205 210 L 225 380 L 105 380 Z" fill="#ffffff" />
-                  <path d="M 155 210 L 165 245 L 175 210 Z" fill="#fed7aa" />
-                  {/* Modern Slim Laptop */}
-                  <rect x="90" y="270" width="100" height="65" rx="6" fill="#334155" />
-                  <rect x="94" y="274" width="92" height="52" rx="4" fill="#ea580c" />
-                  <circle cx="140" cy="300" r="9" fill="#ffffff" opacity="0.9" />
-                  {/* Arms holding laptop */}
-                  <path d="M 115 230 L 95 285 L 125 300" stroke="#fed7aa" strokeWidth="16" strokeLinecap="round" fill="none" />
-                  <path d="M 215 230 L 185 285 L 165 295" stroke="#fed7aa" strokeWidth="16" strokeLinecap="round" fill="none" />
-                </g>
+              {/* Side-by-side Dual Candidate Cards with Real Photos & Props */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+                  gap: '1.25rem',
+                  width: '100%',
+                  alignItems: 'stretch'
+                }}
+              >
+                {/* FEMALE CANDIDATE (Left) - In Formal Attire Holding Modern Laptop */}
+                <div
+                  style={{
+                    position: 'relative',
+                    borderRadius: '20px',
+                    background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%)',
+                    border: '1px solid rgba(251, 146, 60, 0.35)',
+                    overflow: 'hidden',
+                    boxShadow: '0 20px 35px -10px rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                >
+                  {/* Photo Container */}
+                  <div style={{ position: 'relative', width: '100%', height: '270px', overflow: 'hidden' }}>
+                    <img
+                      src="/candidate-female.jpg"
+                      alt="Female Candidate in Formal Attire"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center 15%'
+                      }}
+                    />
+                    {/* Subtle gradient vignette at bottom */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '110px',
+                        background: 'linear-gradient(to top, rgba(15, 23, 42, 0.98) 10%, rgba(15, 23, 42, 0.5) 60%, transparent 100%)'
+                      }}
+                    />
 
-                {/* BOY (Right): Warm Cream collared shirt, holding placement documents */}
-                <g id="boy-student">
-                  {/* Short stylish hair */}
-                  <path d="M 300 115 C 300 70, 390 70, 390 115 C 385 130, 310 130, 300 115 Z" fill="#0f172a" />
-                  {/* Face */}
-                  <ellipse cx="345" cy="135" rx="35" ry="42" fill="#fcd34d" />
-                  {/* Warm Smile & Eyes */}
-                  <path d="M 333 150 Q 345 162 357 150" stroke="#78350f" strokeWidth="3" fill="none" strokeLinecap="round" />
-                  <ellipse cx="334" cy="130" rx="4" ry="5" fill="#451a03" />
-                  <ellipse cx="356" cy="130" rx="4" ry="5" fill="#451a03" />
-                  {/* Eyebrows */}
-                  <path d="M 328 120 Q 334 116 340 120" stroke="#451a03" strokeWidth="2.5" fill="none" />
-                  <path d="M 350 120 Q 356 116 362 120" stroke="#451a03" strokeWidth="2.5" fill="none" />
-                  {/* Warm Ivory Formal Shirt */}
-                  <path d="M 295 205 L 395 205 L 420 380 L 275 380 Z" fill="#ffedd5" />
-                  <path d="M 340 205 L 345 250 L 350 205 Z" fill="#fed7aa" />
-                  {/* Placement Offer Document / Portfolio */}
-                  <g transform="rotate(-10 380 280)">
-                    <rect x="360" y="240" width="85" height="110" rx="4" fill="#ffffff" stroke="#fed7aa" strokeWidth="2" />
-                    <line x1="375" y1="260" x2="430" y2="260" stroke="#ea580c" strokeWidth="4" />
-                    <line x1="375" y1="275" x2="420" y2="275" stroke="#94a3b8" strokeWidth="2.5" />
-                    <line x1="375" y1="290" x2="430" y2="290" stroke="#94a3b8" strokeWidth="2.5" />
-                    <line x1="375" y1="305" x2="410" y2="305" stroke="#94a3b8" strokeWidth="2.5" />
-                    {/* Verified Green Stamp */}
-                    <circle cx="415" cy="325" r="10" fill="#dcfce7" stroke="#16a34a" strokeWidth="1.5" />
-                    <path d="M 411 325 L 414 328 L 420 322" stroke="#16a34a" strokeWidth="2" fill="none" />
-                  </g>
-                  {/* Arms holding paper */}
-                  <path d="M 300 230 L 360 275 L 370 290" stroke="#fcd34d" strokeWidth="16" strokeLinecap="round" fill="none" />
-                  <path d="M 390 230 L 415 285 L 395 305" stroke="#fcd34d" strokeWidth="16" strokeLinecap="round" fill="none" />
-                </g>
-              </svg>
+                    {/* Realistic Laptop In Hand Mockup Overlay */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '12px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '90%',
+                        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(251, 146, 60, 0.5)',
+                        borderRadius: '12px',
+                        padding: '0.5rem 0.65rem',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        zIndex: 2
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          background: 'linear-gradient(135deg, #ea580c, #f97316)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#ffffff',
+                          fontSize: '0.95rem',
+                          flexShrink: 0,
+                          boxShadow: '0 4px 10px rgba(234, 88, 12, 0.4)'
+                        }}
+                      >
+                        <FaLaptopCode />
+                      </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ color: '#ffffff', fontSize: '0.75rem', fontWeight: '800', lineHeight: 1.15 }}>
+                          Holding Laptop
+                        </div>
+                        <div style={{ color: '#fed7aa', fontSize: '0.65rem', fontWeight: '600', marginTop: '2px' }}>
+                          Placed @ Amazon • 28 LPA
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Candidate Detail Footer */}
+                  <div
+                    style={{
+                      padding: '0.75rem 0.85rem',
+                      background: 'rgba(15, 23, 42, 0.98)',
+                      borderTop: '1px solid rgba(255,255,255,0.06)',
+                      textAlign: 'center'
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: '#ffffff',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        display: 'block'
+                      }}
+                    >
+                      Software Engineer
+                    </span>
+                    <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>CS / IT Stream</span>
+                  </div>
+                </div>
+
+                {/* MALE CANDIDATE (Right) - In Formal Suit & Tie Holding Placement Book */}
+                <div
+                  style={{
+                    position: 'relative',
+                    borderRadius: '20px',
+                    background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%)',
+                    border: '1px solid rgba(251, 146, 60, 0.35)',
+                    overflow: 'hidden',
+                    boxShadow: '0 20px 35px -10px rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                >
+                  {/* Photo Container */}
+                  <div style={{ position: 'relative', width: '100%', height: '270px', overflow: 'hidden' }}>
+                    <img
+                      src="/candidate-male.jpg"
+                      alt="Male Candidate in Formal Suit and Tie"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center 15%'
+                      }}
+                    />
+                    {/* Subtle gradient vignette at bottom */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '110px',
+                        background: 'linear-gradient(to top, rgba(15, 23, 42, 0.98) 10%, rgba(15, 23, 42, 0.5) 60%, transparent 100%)'
+                      }}
+                    />
+
+                    {/* Realistic Placement Book / Portfolio In Hand Overlay */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '12px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '90%',
+                        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))',
+                        backdropFilter: 'blur(10px)',
+                        border: '1px solid rgba(251, 146, 60, 0.5)',
+                        borderRadius: '12px',
+                        padding: '0.5rem 0.65rem',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        zIndex: 2
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '8px',
+                          background: 'linear-gradient(135deg, #16a34a, #22c55e)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#ffffff',
+                          fontSize: '0.95rem',
+                          flexShrink: 0,
+                          boxShadow: '0 4px 10px rgba(34, 197, 94, 0.4)'
+                        }}
+                      >
+                        <FaBook />
+                      </div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ color: '#ffffff', fontSize: '0.75rem', fontWeight: '800', lineHeight: 1.15 }}>
+                          Holding Placement Book
+                        </div>
+                        <div style={{ color: '#bbf7d0', fontSize: '0.65rem', fontWeight: '600', marginTop: '2px' }}>
+                          Placed @ Microsoft • 34 LPA
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Candidate Detail Footer */}
+                  <div
+                    style={{
+                      padding: '0.75rem 0.85rem',
+                      background: 'rgba(15, 23, 42, 0.98)',
+                      borderTop: '1px solid rgba(255,255,255,0.06)',
+                      textAlign: 'center'
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: '#ffffff',
+                        fontSize: '0.82rem',
+                        fontWeight: '700',
+                        display: 'block'
+                      }}
+                    >
+                      Product Engineer
+                    </span>
+                    <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>Formal Corporate Suit</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Trust Floating Pill */}
+              <div
+                style={{
+                  marginTop: '1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  color: '#fed7aa',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  background: 'rgba(15, 23, 42, 0.65)',
+                  padding: '0.35rem 0.9rem',
+                  borderRadius: '9999px',
+                  border: '1px solid rgba(251, 146, 60, 0.2)'
+                }}
+              >
+                <FaCheckCircle style={{ color: '#22c55e' }} />
+                <span>Formal Corporate Attire • Ready For Dream Drives</span>
+              </div>
             </div>
           </div>
         </div>
