@@ -1,4 +1,4 @@
-// src/pages/LandingHome.jsx — Flagship Internshala-Inspired Front Page & Campus Recruitment Hub
+// src/pages/LandingHome.jsx — Flagship Internshala-Inspired Front Page with Warm Orange & Deep Slate Brand Theme
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -107,17 +107,30 @@ export default function LandingHome() {
   return (
     <div style={{ background: '#f8fafc', minHeight: '100vh', color: '#0f172a' }}>
       {/* ========================================================================= */}
-      {/* 1. HERO BANNER (Exact Internshala Layout: Boy + Girl, Blue Gradient, CTA) */}
+      {/* 1. HERO BANNER (Warm Orange & Deep Slate Theme, Matching Student Illustration) */}
       {/* ========================================================================= */}
       <section
         style={{
-          background: 'linear-gradient(135deg, #0a3663 0%, #004e89 55%, #0077b6 100%)',
+          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #7c2d12 100%)',
           color: '#ffffff',
           padding: '3rem 2rem 2.5rem',
           position: 'relative',
           overflow: 'hidden'
         }}
       >
+        {/* Soft Ambient Warm Glow Highlights */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: '600px',
+            height: '600px',
+            background: 'radial-gradient(circle at 75% 25%, rgba(249, 115, 22, 0.22) 0%, transparent 60%)',
+            pointerEvents: 'none'
+          }}
+        />
+
         <div
           style={{
             maxWidth: '1280px',
@@ -125,7 +138,9 @@ export default function LandingHome() {
             display: 'grid',
             gridTemplateColumns: 'minmax(320px, 1.15fr) minmax(320px, 0.85fr)',
             alignItems: 'center',
-            gap: '2.5rem'
+            gap: '2.5rem',
+            position: 'relative',
+            zIndex: 1
           }}
         >
           {/* Left Hero Content */}
@@ -135,7 +150,7 @@ export default function LandingHome() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
-                background: 'rgba(255, 255, 255, 0.15)',
+                background: 'rgba(234, 88, 12, 0.2)',
                 backdropFilter: 'blur(10px)',
                 padding: '6px 14px',
                 borderRadius: '30px',
@@ -143,10 +158,11 @@ export default function LandingHome() {
                 fontWeight: 700,
                 letterSpacing: '0.5px',
                 marginBottom: '1.25rem',
-                border: '1px solid rgba(255, 255, 255, 0.25)'
+                border: '1px solid rgba(251, 146, 60, 0.4)',
+                color: '#fed7aa'
               }}
             >
-              <FaUniversity style={{ color: '#fed7aa' }} />
+              <FaUniversity style={{ color: '#f97316' }} />
               <span>OFFICIAL INSTITUTIONAL PLACEMENT PORTAL</span>
             </div>
 
@@ -166,7 +182,7 @@ export default function LandingHome() {
               style={{
                 fontSize: 'clamp(1.1rem, 2vw, 1.35rem)',
                 fontWeight: 500,
-                color: '#e0f2fe',
+                color: '#fed7aa',
                 marginBottom: '2rem',
                 lineHeight: 1.5
               }}
@@ -177,7 +193,7 @@ export default function LandingHome() {
                   position: 'relative',
                   fontWeight: 800,
                   color: '#ffffff',
-                  borderBottom: '3.5px solid #38bdf8',
+                  borderBottom: '3.5px solid #ea580c',
                   paddingBottom: '2px'
                 }}
               >
@@ -186,16 +202,16 @@ export default function LandingHome() {
               , technical prep & dream placements
             </div>
 
-            {/* Candidate Fast Sign-up Card (Matching Internshala Card) */}
+            {/* Candidate Fast Sign-up Card (Warm Ivory & Coral Border) */}
             <div
               style={{
                 background: 'rgba(255, 255, 255, 0.08)',
                 backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                border: '1px solid rgba(251, 146, 60, 0.3)',
                 borderRadius: '18px',
                 padding: '1.4rem 1.6rem',
                 maxWidth: '480px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)'
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)'
               }}
             >
               <div
@@ -204,11 +220,11 @@ export default function LandingHome() {
                   fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
-                  color: '#bae6fd',
+                  color: '#fed7aa',
                   marginBottom: '0.85rem'
                 }}
               >
-                {user ? `Welcome, ${user.name} (${user.role.toUpperCase()})` : 'Candidate sign up'}
+                {user ? `Welcome, ${user.name} (${user.role.toUpperCase()})` : 'Candidate quick sign up'}
               </div>
 
               {user ? (
@@ -217,8 +233,8 @@ export default function LandingHome() {
                     to="/jobs"
                     style={{
                       flex: 1,
-                      background: '#ffffff',
-                      color: '#004e89',
+                      background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                      color: '#ffffff',
                       padding: '11px 16px',
                       borderRadius: '10px',
                       textDecoration: 'none',
@@ -228,7 +244,8 @@ export default function LandingHome() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '8px'
+                      gap: '8px',
+                      boxShadow: '0 4px 12px rgba(234, 88, 12, 0.35)'
                     }}
                   >
                     <span>Browse Drives</span>
@@ -238,9 +255,9 @@ export default function LandingHome() {
                     to="/my-applications"
                     style={{
                       flex: 1,
-                      background: 'rgba(255, 255, 255, 0.2)',
-                      border: '1.5px solid #ffffff',
-                      color: '#ffffff',
+                      background: 'rgba(255, 255, 255, 0.15)',
+                      border: '1.5px solid #fed7aa',
+                      color: '#fed7aa',
                       padding: '11px 16px',
                       borderRadius: '10px',
                       textDecoration: 'none',
@@ -283,8 +300,8 @@ export default function LandingHome() {
                       to="/register"
                       style={{
                         flex: 1,
-                        background: 'rgba(255, 255, 255, 0.15)',
-                        border: '1px solid rgba(255, 255, 255, 0.35)',
+                        background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+                        border: 'none',
                         borderRadius: '10px',
                         padding: '11px 14px',
                         color: '#ffffff',
@@ -294,7 +311,8 @@ export default function LandingHome() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '8px'
+                        gap: '8px',
+                        boxShadow: '0 2px 8px rgba(234, 88, 12, 0.3)'
                       }}
                     >
                       <FaEnvelope />
@@ -306,8 +324,9 @@ export default function LandingHome() {
                     style={{
                       margin: '0.5rem 0 0.85rem',
                       fontSize: '0.72rem',
-                      color: '#93c5fd',
-                      lineHeight: 1.4
+                      color: '#fed7aa',
+                      lineHeight: 1.4,
+                      opacity: 0.9
                     }}
                   >
                     By continuing as a candidate, you agree to our{' '}
@@ -319,7 +338,7 @@ export default function LandingHome() {
                     <Link
                       to="/recruiter"
                       style={{
-                        color: '#bae6fd',
+                        color: '#fed7aa',
                         textDecoration: 'none',
                         fontSize: '0.82rem',
                         fontWeight: 700,
@@ -337,7 +356,7 @@ export default function LandingHome() {
             </div>
           </div>
 
-          {/* Right Hero Visual: Boy and Girl Students Illustration */}
+          {/* Right Hero Visual: Boy and Girl Students Illustration (Warm Lighting) */}
           <div
             style={{
               display: 'flex',
@@ -346,13 +365,12 @@ export default function LandingHome() {
               position: 'relative'
             }}
           >
-            {/* SVG Visual Composition Matching Internshala Student Pair */}
             <div
               style={{
                 width: '100%',
                 maxWidth: '460px',
                 borderRadius: '24px',
-                background: 'radial-gradient(circle at 50% 60%, rgba(56, 189, 248, 0.25) 0%, transparent 70%)',
+                background: 'radial-gradient(circle at 50% 60%, rgba(234, 88, 12, 0.25) 0%, transparent 70%)',
                 padding: '1.5rem 1rem 0',
                 display: 'flex',
                 flexDirection: 'column',
@@ -361,11 +379,11 @@ export default function LandingHome() {
             >
               <svg
                 viewBox="0 0 500 420"
-                style={{ width: '100%', height: 'auto', filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.3))' }}
+                style={{ width: '100%', height: 'auto', filter: 'drop-shadow(0 15px 25px rgba(0,0,0,0.35))' }}
               >
-                {/* Background decorative soft shapes */}
-                <circle cx="250" cy="200" r="160" fill="#0284c7" opacity="0.25" />
-                <circle cx="160" cy="180" r="110" fill="#38bdf8" opacity="0.3" />
+                {/* Background decorative warm soft shapes */}
+                <circle cx="250" cy="200" r="160" fill="#ea580c" opacity="0.22" />
+                <circle cx="160" cy="180" r="110" fill="#f97316" opacity="0.28" />
 
                 {/* GIRL (Left): White formal shirt, holding modern laptop */}
                 <g id="girl-student">
@@ -385,17 +403,17 @@ export default function LandingHome() {
                   <path d="M 172 122 Q 178 118 184 122" stroke="#451a03" strokeWidth="2.5" fill="none" />
                   {/* White Collared Shirt */}
                   <path d="M 125 210 L 205 210 L 225 380 L 105 380 Z" fill="#ffffff" />
-                  <path d="M 155 210 L 165 245 L 175 210 Z" fill="#e2e8f0" />
+                  <path d="M 155 210 L 165 245 L 175 210 Z" fill="#fed7aa" />
                   {/* Modern Slim Laptop */}
                   <rect x="90" y="270" width="100" height="65" rx="6" fill="#334155" />
-                  <rect x="94" y="274" width="92" height="52" rx="4" fill="#0284c7" />
-                  <circle cx="140" cy="300" r="9" fill="#ffffff" opacity="0.8" />
+                  <rect x="94" y="274" width="92" height="52" rx="4" fill="#ea580c" />
+                  <circle cx="140" cy="300" r="9" fill="#ffffff" opacity="0.9" />
                   {/* Arms holding laptop */}
                   <path d="M 115 230 L 95 285 L 125 300" stroke="#fed7aa" strokeWidth="16" strokeLinecap="round" fill="none" />
                   <path d="M 215 230 L 185 285 L 165 295" stroke="#fed7aa" strokeWidth="16" strokeLinecap="round" fill="none" />
                 </g>
 
-                {/* BOY (Right): Light blue collared shirt, holding placement documents */}
+                {/* BOY (Right): Warm Cream collared shirt, holding placement documents */}
                 <g id="boy-student">
                   {/* Short stylish hair */}
                   <path d="M 300 115 C 300 70, 390 70, 390 115 C 385 130, 310 130, 300 115 Z" fill="#0f172a" />
@@ -408,12 +426,12 @@ export default function LandingHome() {
                   {/* Eyebrows */}
                   <path d="M 328 120 Q 334 116 340 120" stroke="#451a03" strokeWidth="2.5" fill="none" />
                   <path d="M 350 120 Q 356 116 362 120" stroke="#451a03" strokeWidth="2.5" fill="none" />
-                  {/* Light Blue Formal Shirt */}
-                  <path d="M 295 205 L 395 205 L 420 380 L 275 380 Z" fill="#bae6fd" />
-                  <path d="M 340 205 L 345 250 L 350 205 Z" fill="#7dd3fc" />
+                  {/* Warm Ivory Formal Shirt */}
+                  <path d="M 295 205 L 395 205 L 420 380 L 275 380 Z" fill="#ffedd5" />
+                  <path d="M 340 205 L 345 250 L 350 205 Z" fill="#fed7aa" />
                   {/* Placement Offer Document / Portfolio */}
                   <g transform="rotate(-10 380 280)">
-                    <rect x="360" y="240" width="85" height="110" rx="4" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" />
+                    <rect x="360" y="240" width="85" height="110" rx="4" fill="#ffffff" stroke="#fed7aa" strokeWidth="2" />
                     <line x1="375" y1="260" x2="430" y2="260" stroke="#ea580c" strokeWidth="4" />
                     <line x1="375" y1="275" x2="420" y2="275" stroke="#94a3b8" strokeWidth="2.5" />
                     <line x1="375" y1="290" x2="430" y2="290" stroke="#94a3b8" strokeWidth="2.5" />
@@ -433,14 +451,14 @@ export default function LandingHome() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. METRICS & MARQUEE HIRING PARTNERS (Matching Internshala Dark Strip)    */}
+      {/* 2. METRICS & MARQUEE HIRING PARTNERS (Deep Slate Black & Warm Orange)     */}
       {/* ========================================================================= */}
       <section
         style={{
-          background: '#042444',
+          background: '#090d16',
           color: '#ffffff',
           padding: '1.25rem 2rem',
-          borderBottom: '1px solid #1e3a5f'
+          borderBottom: '1px solid #1e293b'
         }}
       >
         <div
@@ -461,11 +479,11 @@ export default function LandingHome() {
               alignItems: 'baseline',
               gap: '8px',
               paddingRight: '2rem',
-              borderRight: '2px solid rgba(255, 255, 255, 0.15)'
+              borderRight: '2px solid rgba(234, 88, 12, 0.4)'
             }}
           >
-            <span style={{ fontSize: '2.1rem', fontWeight: 900, color: '#38bdf8' }}>1,200+</span>
-            <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#e0f2fe' }}>Campus Openings</span>
+            <span style={{ fontSize: '2.1rem', fontWeight: 900, color: '#f97316' }}>1,200+</span>
+            <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fed7aa' }}>Campus Openings</span>
           </div>
 
           {/* Marquee Floating Logos */}
@@ -487,7 +505,7 @@ export default function LandingHome() {
                 style={{
                   fontSize: '1.1rem',
                   fontWeight: 800,
-                  color: 'rgba(255, 255, 255, 0.75)',
+                  color: 'rgba(255, 255, 255, 0.85)',
                   letterSpacing: '1px',
                   whiteSpace: 'nowrap',
                   textTransform: 'uppercase'
@@ -529,7 +547,7 @@ export default function LandingHome() {
               <span>Trending now</span>
               <span
                 style={{
-                  background: '#0284c7',
+                  background: '#ea580c',
                   color: '#fff',
                   borderRadius: '50%',
                   width: '26px',
@@ -551,7 +569,7 @@ export default function LandingHome() {
           <Link
             to="/jobs"
             style={{
-              color: '#008bdc',
+              color: '#ea580c',
               textDecoration: 'none',
               fontWeight: 700,
               fontSize: '0.95rem',
@@ -598,11 +616,13 @@ export default function LandingHome() {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.boxShadow = '0 12px 20px -5px rgba(0, 0, 0, 0.08)';
+                  e.currentTarget.style.boxShadow = '0 12px 20px -5px rgba(234, 88, 12, 0.12)';
+                  e.currentTarget.style.borderColor = '#fed7aa';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'none';
                   e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
+                  e.currentTarget.style.borderColor = '#e2e8f0';
                 }}
               >
                 <div>
@@ -650,8 +670,9 @@ export default function LandingHome() {
                     {job.stream && (
                       <span
                         style={{
-                          background: '#e0f2fe',
-                          color: '#0369a1',
+                          background: '#fff7ed',
+                          color: '#c2410c',
+                          border: '1px solid #fed7aa',
                           padding: '4px 10px',
                           borderRadius: '8px',
                           fontWeight: 700
@@ -678,7 +699,7 @@ export default function LandingHome() {
                   <Link
                     to={`/jobs/${job.id}`}
                     style={{
-                      background: '#008bdc',
+                      background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                       color: '#ffffff',
                       padding: '7px 16px',
                       borderRadius: '8px',
@@ -687,7 +708,8 @@ export default function LandingHome() {
                       fontWeight: 700,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '5px'
+                      gap: '5px',
+                      boxShadow: '0 2px 6px rgba(234, 88, 12, 0.25)'
                     }}
                   >
                     <span>View & Apply</span>
@@ -701,7 +723,7 @@ export default function LandingHome() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 4. PLATFORM CAPABILITIES HUB (Everything Accessible From Front Page!)     */}
+      {/* 4. PLATFORM CAPABILITIES HUB (Warm Orange Architecture)                   */}
       {/* ========================================================================= */}
       <section
         style={{
@@ -750,8 +772,11 @@ export default function LandingHome() {
                 border: '1.5px solid #e2e8f0',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                transition: 'border-color 0.2s'
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#fed7aa')}
+              onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
             >
               <div>
                 <div
@@ -759,8 +784,8 @@ export default function LandingHome() {
                     width: '48px',
                     height: '48px',
                     borderRadius: '12px',
-                    background: '#e0f2fe',
-                    color: '#0284c7',
+                    background: '#ffedd5',
+                    color: '#ea580c',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -781,7 +806,7 @@ export default function LandingHome() {
                 to="/assessment"
                 style={{
                   marginTop: '1.5rem',
-                  background: '#0284c7',
+                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                   color: '#ffffff',
                   padding: '9px 16px',
                   borderRadius: '10px',
@@ -790,7 +815,8 @@ export default function LandingHome() {
                   fontSize: '0.88rem',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px'
+                  gap: '6px',
+                  boxShadow: '0 2px 6px rgba(234, 88, 12, 0.25)'
                 }}
               >
                 <span>Launch Coding Test</span>
@@ -807,8 +833,11 @@ export default function LandingHome() {
                 border: '1.5px solid #e2e8f0',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                transition: 'border-color 0.2s'
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#fed7aa')}
+              onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
             >
               <div>
                 <div
@@ -817,7 +846,7 @@ export default function LandingHome() {
                     height: '48px',
                     borderRadius: '12px',
                     background: '#ffedd5',
-                    color: '#ea580c',
+                    color: '#c2410c',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -838,7 +867,7 @@ export default function LandingHome() {
                 to="/ats-checker"
                 style={{
                   marginTop: '1.5rem',
-                  background: '#ea580c',
+                  background: '#c2410c',
                   color: '#ffffff',
                   padding: '9px 16px',
                   borderRadius: '10px',
@@ -847,7 +876,8 @@ export default function LandingHome() {
                   fontSize: '0.88rem',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px'
+                  gap: '6px',
+                  boxShadow: '0 2px 6px rgba(194, 65, 12, 0.25)'
                 }}
               >
                 <span>Check ATS Score</span>
@@ -864,8 +894,11 @@ export default function LandingHome() {
                 border: '1.5px solid #e2e8f0',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                transition: 'border-color 0.2s'
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#fed7aa')}
+              onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
             >
               <div>
                 <div
@@ -921,8 +954,11 @@ export default function LandingHome() {
                 border: '1.5px solid #e2e8f0',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                transition: 'border-color 0.2s'
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#fed7aa')}
+              onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
             >
               <div>
                 <div
@@ -930,8 +966,8 @@ export default function LandingHome() {
                     width: '48px',
                     height: '48px',
                     borderRadius: '12px',
-                    background: '#f3e8ff',
-                    color: '#9333ea',
+                    background: '#fff7ed',
+                    color: '#ea580c',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -952,7 +988,7 @@ export default function LandingHome() {
                 to="/messages"
                 style={{
                   marginTop: '1.5rem',
-                  background: '#9333ea',
+                  background: '#0f172a',
                   color: '#ffffff',
                   padding: '9px 16px',
                   borderRadius: '10px',
@@ -978,8 +1014,11 @@ export default function LandingHome() {
                 border: '1.5px solid #e2e8f0',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                transition: 'border-color 0.2s'
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#fed7aa')}
+              onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
             >
               <div>
                 <div
@@ -1035,8 +1074,11 @@ export default function LandingHome() {
                 border: '1.5px solid #e2e8f0',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                transition: 'border-color 0.2s'
               }}
+              onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#fed7aa')}
+              onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#e2e8f0')}
             >
               <div>
                 <div
@@ -1044,8 +1086,8 @@ export default function LandingHome() {
                     width: '48px',
                     height: '48px',
                     borderRadius: '12px',
-                    background: '#fee2e2',
-                    color: '#dc2626',
+                    background: '#ffedd5',
+                    color: '#ea580c',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1066,7 +1108,7 @@ export default function LandingHome() {
                 to="/forum"
                 style={{
                   marginTop: '1.5rem',
-                  background: '#dc2626',
+                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                   color: '#ffffff',
                   padding: '9px 16px',
                   borderRadius: '10px',
@@ -1075,7 +1117,8 @@ export default function LandingHome() {
                   fontSize: '0.88rem',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px'
+                  gap: '6px',
+                  boxShadow: '0 2px 6px rgba(234, 88, 12, 0.25)'
                 }}
               >
                 <span>Read Bulletin</span>
@@ -1087,7 +1130,7 @@ export default function LandingHome() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 5. CONTACT US & INTERACTIVE QR CODE FOOTER (As Requested by User)        */}
+      {/* 5. CONTACT US & INTERACTIVE QR CODE FOOTER (Deep Slate Navy & Warm Amber) */}
       {/* ========================================================================= */}
       <footer
         style={{
@@ -1111,7 +1154,9 @@ export default function LandingHome() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
               <img src="/campusconnect-logo.svg" alt="CampusConnect" style={{ width: '32px', height: '32px' }} />
-              <span style={{ fontSize: '1.4rem', fontWeight: 800 }}>CampusConnect</span>
+              <span style={{ fontSize: '1.4rem', fontWeight: 800 }}>
+                Campus<span style={{ color: '#ea580c' }}>Connect</span>
+              </span>
             </div>
             <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
               Central Directorate of Career Development & Campus Placement Cell. Empowering engineering, management, and technical candidates with zero-friction placements.
@@ -1124,7 +1169,7 @@ export default function LandingHome() {
               </div>
               <div>
                 <strong style={{ color: '#ffffff' }}>Official Email: </strong>
-                <a href="mailto:placement@campus.edu" style={{ color: '#38bdf8', textDecoration: 'none' }}>
+                <a href="mailto:placement@campus.edu" style={{ color: '#f97316', textDecoration: 'none' }}>
                   placement@campus.edu
                 </a>
               </div>
@@ -1155,6 +1200,8 @@ export default function LandingHome() {
                   fontSize: '0.85rem',
                   outline: 'none'
                 }}
+                onFocus={(e) => (e.target.style.borderColor = '#ea580c')}
+                onBlur={(e) => (e.target.style.borderColor = '#334155')}
               />
               <input
                 type="email"
@@ -1170,6 +1217,8 @@ export default function LandingHome() {
                   fontSize: '0.85rem',
                   outline: 'none'
                 }}
+                onFocus={(e) => (e.target.style.borderColor = '#ea580c')}
+                onBlur={(e) => (e.target.style.borderColor = '#334155')}
               />
               <textarea
                 rows={3}
@@ -1186,11 +1235,13 @@ export default function LandingHome() {
                   outline: 'none',
                   resize: 'none'
                 }}
+                onFocus={(e) => (e.target.style.borderColor = '#ea580c')}
+                onBlur={(e) => (e.target.style.borderColor = '#334155')}
               />
               <button
                 type="submit"
                 style={{
-                  background: '#008bdc',
+                  background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                   border: 'none',
                   borderRadius: '8px',
                   padding: '9px 14px',
@@ -1201,7 +1252,8 @@ export default function LandingHome() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px'
+                  gap: '6px',
+                  boxShadow: '0 2px 6px rgba(234, 88, 12, 0.25)'
                 }}
               >
                 <FaPaperPlane />
@@ -1210,13 +1262,13 @@ export default function LandingHome() {
             </form>
           </div>
 
-          {/* Column 3: Interactive QR Code (As requested by user) */}
+          {/* Column 3: Interactive QR Code (Warm Orange Highlights) */}
           <div
             style={{
               background: '#1e293b',
               borderRadius: '16px',
               padding: '1.5rem',
-              border: '1px solid #334155',
+              border: '1px solid rgba(251, 146, 60, 0.25)',
               textAlign: 'center',
               display: 'flex',
               flexDirection: 'column',
@@ -1235,42 +1287,41 @@ export default function LandingHome() {
             >
               {/* Scalable High-Fidelity SVG QR Code */}
               <svg width="130" height="130" viewBox="0 0 130 130">
-                {/* QR Finder Patterns */}
                 <rect width="130" height="130" fill="#ffffff" />
                 {/* Top-Left */}
                 <rect x="10" y="10" width="35" height="35" fill="#0f172a" rx="4" />
                 <rect x="16" y="16" width="23" height="23" fill="#ffffff" rx="2" />
-                <rect x="22" y="22" width="11" height="11" fill="#008bdc" rx="1" />
+                <rect x="22" y="22" width="11" height="11" fill="#ea580c" rx="1" />
                 {/* Top-Right */}
                 <rect x="85" y="10" width="35" height="35" fill="#0f172a" rx="4" />
                 <rect x="91" y="16" width="23" height="23" fill="#ffffff" rx="2" />
-                <rect x="97" y="22" width="11" height="11" fill="#008bdc" rx="1" />
+                <rect x="97" y="22" width="11" height="11" fill="#ea580c" rx="1" />
                 {/* Bottom-Left */}
                 <rect x="10" y="85" width="35" height="35" fill="#0f172a" rx="4" />
                 <rect x="16" y="91" width="23" height="23" fill="#ffffff" rx="2" />
-                <rect x="22" y="97" width="11" height="11" fill="#008bdc" rx="1" />
+                <rect x="22" y="97" width="11" height="11" fill="#ea580c" rx="1" />
                 {/* Data Modules */}
                 <rect x="52" y="15" width="8" height="8" fill="#0f172a" />
                 <rect x="68" y="15" width="8" height="8" fill="#0f172a" />
-                <rect x="52" y="32" width="8" height="8" fill="#008bdc" />
+                <rect x="52" y="32" width="8" height="8" fill="#ea580c" />
                 <rect x="68" y="32" width="8" height="8" fill="#0f172a" />
                 <rect x="15" y="52" width="8" height="8" fill="#0f172a" />
-                <rect x="32" y="52" width="8" height="8" fill="#008bdc" />
-                <rect x="52" y="52" width="24" height="24" rx="4" fill="#0284c7" />
+                <rect x="32" y="52" width="8" height="8" fill="#ea580c" />
+                <rect x="52" y="52" width="24" height="24" rx="4" fill="#c2410c" />
                 <rect x="85" y="52" width="8" height="8" fill="#0f172a" />
                 <rect x="102" y="52" width="8" height="8" fill="#0f172a" />
                 <rect x="52" y="85" width="8" height="8" fill="#0f172a" />
-                <rect x="68" y="85" width="8" height="8" fill="#008bdc" />
+                <rect x="68" y="85" width="8" height="8" fill="#ea580c" />
                 <rect x="85" y="85" width="8" height="8" fill="#0f172a" />
                 <rect x="102" y="102" width="8" height="8" fill="#0f172a" />
                 <rect x="68" y="102" width="8" height="8" fill="#0f172a" />
-                <rect x="52" y="102" width="8" height="8" fill="#008bdc" />
+                <rect x="52" y="102" width="8" height="8" fill="#ea580c" />
               </svg>
             </div>
             <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#ffffff', marginBottom: '3px' }}>
               Mobile Placement Handbook
             </div>
-            <div style={{ fontSize: '0.74rem', color: '#94a3b8', lineHeight: 1.4 }}>
+            <div style={{ fontSize: '0.74rem', color: '#fed7aa', lineHeight: 1.4 }}>
               Scan QR code with your mobile camera for drive alerts & schedules
             </div>
           </div>

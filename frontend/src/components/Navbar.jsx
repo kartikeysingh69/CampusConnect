@@ -1,4 +1,4 @@
-// src/components/Navbar.jsx — Clean Internshala-style Header with Jobs Stream Dropdown, Search Bar & Streamlined Navigation
+// src/components/Navbar.jsx — Clean Internshala-style Header with Warm Orange Brand Palette
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -51,11 +51,11 @@ export default function Navbar() {
   }, []);
 
   const streamLinks = [
-    { name: 'Computer Science & IT', branch: 'Computer Science', icon: <FaLaptopCode style={{ color: '#2563eb' }} /> },
-    { name: 'Mechanical Engineering', branch: 'Mechanical', icon: <FaCogs style={{ color: '#ea580c' }} /> },
-    { name: 'Electronics & Electrical', branch: 'Electronics', icon: <FaBolt style={{ color: '#eab308' }} /> },
+    { name: 'Computer Science & IT', branch: 'Computer Science', icon: <FaLaptopCode style={{ color: '#ea580c' }} /> },
+    { name: 'Mechanical Engineering', branch: 'Mechanical', icon: <FaCogs style={{ color: '#d97706' }} /> },
+    { name: 'Electronics & Electrical', branch: 'Electronics', icon: <FaBolt style={{ color: '#f59e0b' }} /> },
     { name: 'Civil Engineering', branch: 'Civil', icon: <FaDraftingCompass style={{ color: '#16a34a' }} /> },
-    { name: 'Business & Management', branch: 'Business', icon: <FaBriefcase style={{ color: '#8b5cf6' }} /> },
+    { name: 'Business & Management', branch: 'Business', icon: <FaBriefcase style={{ color: '#7c3aed' }} /> },
     { name: 'All Campus Drives', branch: '', icon: <FaBuilding style={{ color: '#64748b' }} /> }
   ];
 
@@ -68,7 +68,7 @@ export default function Navbar() {
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -100,22 +100,22 @@ export default function Navbar() {
               color: '#0f172a'
             }}
           >
-            Campus<span style={{ color: '#008bdc' }}>Connect</span>
+            Campus<span style={{ color: '#ea580c' }}>Connect</span>
           </span>
         </Link>
 
-        {/* Jobs Stream Dropdown (Internshala Style) */}
+        {/* Jobs Stream Dropdown (Warm Orange Hover) */}
         <div style={{ position: 'relative' }} ref={dropdownRef}>
           <button
             type="button"
             onClick={() => setDropdownOpen(!dropdownOpen)}
             onMouseEnter={() => setDropdownOpen(true)}
             style={{
-              background: dropdownOpen ? '#f0f9ff' : 'transparent',
+              background: dropdownOpen ? '#fff7ed' : 'transparent',
               border: 'none',
               padding: '6px 12px',
               borderRadius: '8px',
-              color: '#334155',
+              color: dropdownOpen ? '#ea580c' : '#334155',
               fontSize: '0.95rem',
               fontWeight: 600,
               cursor: 'pointer',
@@ -129,7 +129,7 @@ export default function Navbar() {
             <FaChevronDown
               style={{
                 fontSize: '0.72rem',
-                color: '#64748b',
+                color: dropdownOpen ? '#ea580c' : '#64748b',
                 transform: dropdownOpen ? 'rotate(180deg)' : 'none',
                 transition: 'transform 0.2s ease'
               }}
@@ -147,7 +147,7 @@ export default function Navbar() {
                 background: '#ffffff',
                 borderRadius: '14px',
                 boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #fed7aa',
                 padding: '0.5rem',
                 minWidth: '260px',
                 zIndex: 1010,
@@ -183,7 +183,7 @@ export default function Navbar() {
                     fontWeight: 600,
                     transition: 'background 0.15s ease'
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f8fafc')}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#fff7ed')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
                   <span style={{ fontSize: '1rem', display: 'flex' }}>{item.icon}</span>
@@ -195,7 +195,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Center: Search Bar (Internshala Style) */}
+      {/* Center: Search Bar with Warm Focus */}
       <form
         onSubmit={handleSearchSubmit}
         style={{
@@ -232,7 +232,7 @@ export default function Navbar() {
             boxSizing: 'border-box'
           }}
           onFocus={(e) => {
-            e.target.style.borderColor = '#008bdc';
+            e.target.style.borderColor = '#ea580c';
             e.target.style.background = '#ffffff';
           }}
           onBlur={(e) => {
@@ -280,7 +280,7 @@ export default function Navbar() {
                 <Link
                   to="/recruiter"
                   style={{
-                    color: '#008bdc',
+                    color: '#ea580c',
                     textDecoration: 'none',
                     fontWeight: 700,
                     fontSize: '0.9rem',
@@ -309,7 +309,7 @@ export default function Navbar() {
                 <Link
                   to="/admin"
                   style={{
-                    color: '#008bdc',
+                    color: '#ea580c',
                     textDecoration: 'none',
                     fontWeight: 700,
                     fontSize: '0.9rem',
@@ -355,17 +355,17 @@ export default function Navbar() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: '#f1f5f9',
-                border: '1px solid #e2e8f0',
+                background: '#fff7ed',
+                border: '1px solid #fed7aa',
                 borderRadius: '30px',
                 padding: '4px 12px',
                 textDecoration: 'none',
-                color: '#1e293b',
+                color: '#c2410c',
                 fontSize: '0.85rem',
                 fontWeight: 700
               }}
             >
-              <FaUser style={{ color: '#008bdc' }} />
+              <FaUser style={{ color: '#ea580c' }} />
               <span>{user.name}</span>
             </Link>
 
@@ -401,13 +401,13 @@ export default function Navbar() {
           </>
         ) : (
           <>
-            {/* Login Button (Internshala Outlined Style) */}
+            {/* Login Button (Warm Orange Outlined Style) */}
             <Link
               to="/login"
               style={{
-                border: '1.5px solid #008bdc',
+                border: '1.5px solid #ea580c',
                 borderRadius: '8px',
-                color: '#008bdc',
+                color: '#ea580c',
                 background: '#ffffff',
                 padding: '6px 18px',
                 textDecoration: 'none',
@@ -416,7 +416,7 @@ export default function Navbar() {
                 transition: 'all 0.15s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f0f9ff';
+                e.currentTarget.style.background = '#fff7ed';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = '#ffffff';
@@ -425,31 +425,32 @@ export default function Navbar() {
               Login
             </Link>
 
-            {/* Register Button (Internshala Solid Primary Style) */}
+            {/* Register Button (Warm Orange Gradient Style) */}
             <Link
               to="/register"
               style={{
-                background: '#008bdc',
+                background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
                 borderRadius: '8px',
                 color: '#ffffff',
-                border: '1.5px solid #008bdc',
-                padding: '6px 20px',
+                border: 'none',
+                padding: '7px 20px',
                 textDecoration: 'none',
                 fontWeight: 700,
                 fontSize: '0.9rem',
-                transition: 'background 0.15s ease'
+                boxShadow: '0 2px 6px rgba(234, 88, 12, 0.25)',
+                transition: 'opacity 0.15s ease'
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#0072b5')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = '#008bdc')}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
             >
               Register
             </Link>
 
-            {/* For Employers Link (Internshala Style) */}
+            {/* For Employers Link */}
             <Link
               to="/recruiter"
               style={{
-                color: '#008bdc',
+                color: '#ea580c',
                 textDecoration: 'none',
                 fontWeight: 700,
                 fontSize: '0.88rem',
