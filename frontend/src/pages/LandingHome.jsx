@@ -138,9 +138,9 @@ export default function LandingHome() {
             maxWidth: '1280px',
             margin: '0 auto',
             display: 'grid',
-            gridTemplateColumns: 'minmax(320px, 1.15fr) minmax(320px, 0.85fr)',
-            alignItems: 'center',
-            gap: '2.5rem',
+            gridTemplateColumns: 'minmax(320px, 1fr) minmax(340px, 1.08fr)',
+            alignItems: 'flex-end',
+            gap: '2rem',
             position: 'relative',
             zIndex: 1
           }}
@@ -366,20 +366,19 @@ export default function LandingHome() {
               alignItems: 'flex-end',
               position: 'relative',
               width: '100%',
-              maxWidth: '560px',
-              minHeight: '420px'
+              maxWidth: '720px'
             }}
           >
             {/* Ambient Warm Orange Glow */}
             <div
               style={{
                 position: 'absolute',
-                width: '420px',
-                height: '420px',
-                background: 'radial-gradient(circle, rgba(234, 88, 12, 0.3) 0%, rgba(249, 115, 22, 0.12) 50%, transparent 70%)',
-                filter: 'blur(40px)',
+                width: '520px',
+                height: '520px',
+                background: 'radial-gradient(circle, rgba(234, 88, 12, 0.35) 0%, rgba(249, 115, 22, 0.15) 50%, transparent 70%)',
+                filter: 'blur(50px)',
                 zIndex: 0,
-                bottom: '10px',
+                bottom: '0px',
                 pointerEvents: 'none'
               }}
             />
@@ -402,11 +401,11 @@ export default function LandingHome() {
                   alt="CampusConnect Formal Candidates with Laptop and Placement Offer Documents"
                   style={{
                     width: '100%',
-                    maxWidth: '560px',
+                    maxWidth: '680px',
                     height: 'auto',
-                    maxHeight: '460px',
+                    maxHeight: '540px',
                     objectFit: 'contain',
-                    filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.45))'
+                    filter: 'drop-shadow(0 20px 35px rgba(0, 0, 0, 0.55))'
                   }}
                 />
               </picture>
