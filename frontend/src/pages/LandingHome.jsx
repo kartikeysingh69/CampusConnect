@@ -362,7 +362,7 @@ export default function LandingHome() {
           <div
             style={{
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: 'flex-end',
               alignItems: 'flex-end',
               position: 'relative',
               width: '100%',
@@ -379,6 +379,7 @@ export default function LandingHome() {
                 filter: 'blur(50px)',
                 zIndex: 0,
                 bottom: '0px',
+                right: '0px',
                 pointerEvents: 'none'
               }}
             />
@@ -390,11 +391,11 @@ export default function LandingHome() {
                 zIndex: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
+                alignItems: 'flex-end',
                 width: '100%'
               }}
             >
-              <picture style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+              <picture style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
                 <source srcSet="/hero-students-authentic.webp" type="image/webp" />
                 <img
                   src="/hero-candidates-standing.png"
@@ -409,29 +410,6 @@ export default function LandingHome() {
                   }}
                 />
               </picture>
-
-              {/* Floating Verified Achievement Pill */}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: '12px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  background: 'rgba(15, 23, 42, 0.85)',
-                  backdropFilter: 'blur(12px)',
-                  border: '1px solid rgba(251, 146, 60, 0.4)',
-                  padding: '0.4rem 1rem',
-                  borderRadius: '9999px',
-                  color: '#ffedd5',
-                  fontSize: '0.76rem',
-                  fontWeight: '700',
-                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
-                }}
-              >
-                <FaCheckCircle style={{ color: '#22c55e' }} />
-                <span>Class of 2026 • 100% Campus Placement Verified</span>
-              </div>
             </div>
           </div>
         </div>
