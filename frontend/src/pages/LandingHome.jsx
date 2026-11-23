@@ -358,318 +358,77 @@ export default function LandingHome() {
             </div>
           </div>
 
-          {/* Right Hero Visual: Formal Male & Female Candidates with Laptop and Placement Book */}
+          {/* Right Hero Visual: Internshala-Style Standing Male & Female Candidates Duo */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center',
+              alignItems: 'flex-end',
               position: 'relative',
               width: '100%',
-              maxWidth: '560px'
+              maxWidth: '560px',
+              minHeight: '420px'
             }}
           >
             {/* Ambient Warm Orange Glow */}
             <div
               style={{
                 position: 'absolute',
-                width: '380px',
-                height: '380px',
-                background: 'radial-gradient(circle, rgba(234, 88, 12, 0.35) 0%, rgba(249, 115, 22, 0.15) 50%, transparent 70%)',
-                filter: 'blur(35px)',
+                width: '420px',
+                height: '420px',
+                background: 'radial-gradient(circle, rgba(234, 88, 12, 0.3) 0%, rgba(249, 115, 22, 0.12) 50%, transparent 70%)',
+                filter: 'blur(40px)',
                 zIndex: 0,
+                bottom: '10px',
                 pointerEvents: 'none'
               }}
             />
 
-            {/* Main Stage Container with Dual Candidate Showcase */}
+            {/* Seamless Standing Duo Image (Internshala Style) */}
             <div
               style={{
                 position: 'relative',
                 zIndex: 1,
-                width: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center'
+                alignItems: 'center',
+                width: '100%'
               }}
             >
-              {/* Floating Top Badge */}
+              <img
+                src="/hero-candidates-standing.png"
+                alt="CampusConnect Formal Candidates with Laptop and Placement Dossier"
+                style={{
+                  width: '100%',
+                  maxWidth: '520px',
+                  height: 'auto',
+                  maxHeight: '440px',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 20px 30px rgba(0, 0, 0, 0.5))'
+                }}
+              />
+
+              {/* Floating Verified Achievement Pill */}
               <div
                 style={{
+                  position: 'absolute',
+                  bottom: '12px',
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  background: 'rgba(15, 23, 42, 0.9)',
+                  background: 'rgba(15, 23, 42, 0.85)',
                   backdropFilter: 'blur(12px)',
                   border: '1px solid rgba(251, 146, 60, 0.4)',
-                  padding: '0.45rem 1rem',
+                  padding: '0.4rem 1rem',
                   borderRadius: '9999px',
                   color: '#ffedd5',
-                  fontSize: '0.78rem',
+                  fontSize: '0.76rem',
                   fontWeight: '700',
-                  boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3)',
-                  marginBottom: '1rem',
-                  letterSpacing: '0.3px'
-                }}
-              >
-                <span
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: '#22c55e',
-                    boxShadow: '0 0 10px #22c55e'
-                  }}
-                />
-                <span>CAMPUS CONNECT • 100% VERIFIED PLACEMENT SUCCESS</span>
-              </div>
-
-              {/* Side-by-side Dual Candidate Cards with Real Photos & Props */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-                  gap: '1.25rem',
-                  width: '100%',
-                  alignItems: 'stretch'
-                }}
-              >
-                {/* FEMALE CANDIDATE (Left) - In Formal Attire Holding Modern Laptop */}
-                <div
-                  style={{
-                    position: 'relative',
-                    borderRadius: '20px',
-                    background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%)',
-                    border: '1px solid rgba(251, 146, 60, 0.35)',
-                    overflow: 'hidden',
-                    boxShadow: '0 20px 35px -10px rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    flexDirection: 'column'
-                  }}
-                >
-                  {/* Photo Container */}
-                  <div style={{ position: 'relative', width: '100%', height: '270px', overflow: 'hidden' }}>
-                    <img
-                      src="/candidate-female.jpg"
-                      alt="Female Candidate in Formal Attire"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center 15%'
-                      }}
-                    />
-                    {/* Subtle gradient vignette at bottom */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: '110px',
-                        background: 'linear-gradient(to top, rgba(15, 23, 42, 0.98) 10%, rgba(15, 23, 42, 0.5) 60%, transparent 100%)'
-                      }}
-                    />
-
-                    {/* Realistic Laptop In Hand Mockup Overlay */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '12px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '90%',
-                        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(251, 146, 60, 0.5)',
-                        borderRadius: '12px',
-                        padding: '0.5rem 0.65rem',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        zIndex: 2
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '8px',
-                          background: 'linear-gradient(135deg, #ea580c, #f97316)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#ffffff',
-                          fontSize: '0.95rem',
-                          flexShrink: 0,
-                          boxShadow: '0 4px 10px rgba(234, 88, 12, 0.4)'
-                        }}
-                      >
-                        <FaLaptopCode />
-                      </div>
-                      <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ color: '#ffffff', fontSize: '0.75rem', fontWeight: '800', lineHeight: 1.15 }}>
-                          Holding Laptop
-                        </div>
-                        <div style={{ color: '#fed7aa', fontSize: '0.65rem', fontWeight: '600', marginTop: '2px' }}>
-                          Placed @ Amazon • 28 LPA
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Candidate Detail Footer */}
-                  <div
-                    style={{
-                      padding: '0.75rem 0.85rem',
-                      background: 'rgba(15, 23, 42, 0.98)',
-                      borderTop: '1px solid rgba(255,255,255,0.06)',
-                      textAlign: 'center'
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: '#ffffff',
-                        fontSize: '0.82rem',
-                        fontWeight: '700',
-                        display: 'block'
-                      }}
-                    >
-                      Software Engineer
-                    </span>
-                    <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>CS / IT Stream</span>
-                  </div>
-                </div>
-
-                {/* MALE CANDIDATE (Right) - In Formal Suit & Tie Holding Placement Book */}
-                <div
-                  style={{
-                    position: 'relative',
-                    borderRadius: '20px',
-                    background: 'linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.95) 100%)',
-                    border: '1px solid rgba(251, 146, 60, 0.35)',
-                    overflow: 'hidden',
-                    boxShadow: '0 20px 35px -10px rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    flexDirection: 'column'
-                  }}
-                >
-                  {/* Photo Container */}
-                  <div style={{ position: 'relative', width: '100%', height: '270px', overflow: 'hidden' }}>
-                    <img
-                      src="/candidate-male.jpg"
-                      alt="Male Candidate in Formal Suit and Tie"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center 15%'
-                      }}
-                    />
-                    {/* Subtle gradient vignette at bottom */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: '110px',
-                        background: 'linear-gradient(to top, rgba(15, 23, 42, 0.98) 10%, rgba(15, 23, 42, 0.5) 60%, transparent 100%)'
-                      }}
-                    />
-
-                    {/* Realistic Placement Book / Portfolio In Hand Overlay */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        bottom: '12px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '90%',
-                        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))',
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(251, 146, 60, 0.5)',
-                        borderRadius: '12px',
-                        padding: '0.5rem 0.65rem',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        zIndex: 2
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '8px',
-                          background: 'linear-gradient(135deg, #16a34a, #22c55e)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#ffffff',
-                          fontSize: '0.95rem',
-                          flexShrink: 0,
-                          boxShadow: '0 4px 10px rgba(34, 197, 94, 0.4)'
-                        }}
-                      >
-                        <FaBook />
-                      </div>
-                      <div style={{ minWidth: 0, flex: 1 }}>
-                        <div style={{ color: '#ffffff', fontSize: '0.75rem', fontWeight: '800', lineHeight: 1.15 }}>
-                          Holding Placement Book
-                        </div>
-                        <div style={{ color: '#bbf7d0', fontSize: '0.65rem', fontWeight: '600', marginTop: '2px' }}>
-                          Placed @ Microsoft • 34 LPA
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Candidate Detail Footer */}
-                  <div
-                    style={{
-                      padding: '0.75rem 0.85rem',
-                      background: 'rgba(15, 23, 42, 0.98)',
-                      borderTop: '1px solid rgba(255,255,255,0.06)',
-                      textAlign: 'center'
-                    }}
-                  >
-                    <span
-                      style={{
-                        color: '#ffffff',
-                        fontSize: '0.82rem',
-                        fontWeight: '700',
-                        display: 'block'
-                      }}
-                    >
-                      Product Engineer
-                    </span>
-                    <span style={{ color: '#94a3b8', fontSize: '0.7rem' }}>Formal Corporate Suit</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Trust Floating Pill */}
-              <div
-                style={{
-                  marginTop: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  color: '#fed7aa',
-                  fontSize: '0.75rem',
-                  fontWeight: '600',
-                  background: 'rgba(15, 23, 42, 0.65)',
-                  padding: '0.35rem 0.9rem',
-                  borderRadius: '9999px',
-                  border: '1px solid rgba(251, 146, 60, 0.2)'
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
                 }}
               >
                 <FaCheckCircle style={{ color: '#22c55e' }} />
-                <span>Formal Corporate Attire • Ready For Dream Drives</span>
+                <span>Class of 2026 • 100% Campus Placement Verified</span>
               </div>
             </div>
           </div>
