@@ -6,6 +6,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
+const db = require('./config/db');
 
 // .env file se secrets load karo (jaise DB password, JWT key)
 dotenv.config();
@@ -62,9 +63,28 @@ app.use('/api/admin', adminBatchRoutes);      // /api/admin/import-students (bat
 app.get('/', (req, res) => {
   res.json({
     message: '🎓 CampusConnect API is running!',
-    version: '1.0.0',
+    version: '2.4.0',
     status: 'OK'
   });
+});
+
+app.get('/api/health', async (req, res) => {
+  try {
+    const [result] = await db.execute('SELECT 1 as alive');
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: Math.floor(process.uptime()),
+      database: result[0]?.alive === 1 ? 'connected' : 'degraded',
+      environment: process.env.NODE_ENV || 'development'
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'unhealthy',
+      database: 'disconnected',
+      error: error.message
+    });
+  }
 });
 
 // ---- Server Start ----

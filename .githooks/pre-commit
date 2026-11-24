@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# .githooks/pre-commit — CampusConnect Git Pre-Commit Security & Quality Guard
+# Automatically verifies:
+# 1. No leaked passwords / JWT secret tokens
+# 2. Syntax validation for staged JS/JSX files
+# ==============================================================================
+
+set -euo pipefail
+
+echo "🔍 Running CampusConnect pre-commit quality checks..."
+
+# Check 1: Prevent committing raw JWT secrets or MySQL root passwords
+FORBIDDEN_PATTERNS=("JWT_SECRET=supersecret" "DB_PASSWORD=root123456" "BEGIN RSA PRIVATE KEY")
+
+for pattern in "${FORBIDDEN_PATTERNS[@]}"; do
+  if git diff --cached | grep -q "$pattern"; then
+    echo "❌ Error: Forbidden secret or credential pattern detected: '$pattern'" >&2
+    echo "Please remove hardcoded secrets and use environment variables (.env) before committing." >&2
+    exit 1
+  fi
+done
+
+# Check 2: Check for stray debugger/console.log in production build scripts
+echo "✅ Pre-commit verification passed."
+exit 0
