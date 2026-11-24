@@ -366,15 +366,15 @@ export default function LandingHome() {
               alignItems: 'flex-end',
               position: 'relative',
               width: '100%',
-              maxWidth: '720px'
+              maxWidth: '780px'
             }}
           >
             {/* Ambient Warm Orange Glow */}
             <div
               style={{
                 position: 'absolute',
-                width: '520px',
-                height: '520px',
+                width: '560px',
+                height: '560px',
                 background: 'radial-gradient(circle, rgba(234, 88, 12, 0.35) 0%, rgba(249, 115, 22, 0.15) 50%, transparent 70%)',
                 filter: 'blur(50px)',
                 zIndex: 0,
@@ -402,10 +402,13 @@ export default function LandingHome() {
                   alt="CampusConnect Formal Candidates with Laptop and Placement Offer Documents"
                   style={{
                     width: '100%',
-                    maxWidth: '680px',
+                    maxWidth: '760px',
                     height: 'auto',
-                    maxHeight: '540px',
+                    maxHeight: '600px',
                     objectFit: 'contain',
+                    objectPosition: 'bottom right',
+                    marginBottom: '-4px',
+                    marginRight: '-12px',
                     filter: 'drop-shadow(0 20px 35px rgba(0, 0, 0, 0.55))'
                   }}
                 />
