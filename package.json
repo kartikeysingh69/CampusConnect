@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
-    "test": "echo \"Tests will be added in Phase 2\" && exit 0"
+    "test": "node --test tests/**/*.test.js"
   },
   "keywords": [],
   "author": "",

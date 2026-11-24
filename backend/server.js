@@ -88,9 +88,11 @@ app.get('/api/health', async (req, res) => {
 });
 
 // ---- Server Start ----
-app.listen(PORT, () => {
-  console.log(`✅ CampusConnect Server running at http://localhost:${PORT}`);
-  console.log(`📋 Environment: ${process.env.NODE_ENV}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`✅ CampusConnect Server running at http://localhost:${PORT}`);
+    console.log(`📋 Environment: ${process.env.NODE_ENV}`);
+  });
+}
 
 module.exports = app;

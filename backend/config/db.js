@@ -15,15 +15,17 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// Test connection (server start hone par check karo)
-pool.getConnection()
-  .then(conn => {
-    console.log('✅ MySQL Database connected successfully!');
-    conn.release();
-  })
-  .catch(err => {
-    console.error('❌ MySQL Connection Failed:', err.message);
-    console.log('💡 Tip: Check your DB_PASSWORD in .env file');
-  });
+// Test connection (server start hone par check karo, unit test mode me skip)
+if (process.env.NODE_ENV !== 'test') {
+  pool.getConnection()
+    .then(conn => {
+      console.log('✅ MySQL Database connected successfully!');
+      conn.release();
+    })
+    .catch(err => {
+      console.error('❌ MySQL Connection Failed:', err.message);
+      console.log('💡 Tip: Check your DB_PASSWORD in .env file');
+    });
+}
 
 module.exports = pool;
