@@ -13,14 +13,17 @@ import {
   FaBolt,
   FaDraftingCompass,
   FaBriefcase,
-  FaBuilding
+  FaBuilding,
+  FaEllipsisV
 } from 'react-icons/fa';
 import NotificationBell from './NotificationBell';
+import QuickLauncherDrawer from './QuickLauncherDrawer';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [launcherOpen, setLauncherOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef(null);
 
@@ -75,8 +78,47 @@ export default function Navbar() {
         gap: '1.25rem'
       }}
     >
-      {/* Left: Brand Logo & Jobs Dropdown */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+      {/* Left: 3-Dot Quick Launcher + Brand Logo & Jobs Dropdown */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        {/* 3-Dot Global Platform Hub Launcher Button */}
+        <button
+          type="button"
+          onClick={() => setLauncherOpen(true)}
+          title="All Platform Features & Tools"
+          aria-label="Open Platform Navigation Menu"
+          style={{
+            background: launcherOpen ? '#fff7ed' : '#f8fafc',
+            border: '1.5px solid #fed7aa',
+            borderRadius: '9px',
+            width: '36px',
+            height: '36px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#ea580c',
+            cursor: 'pointer',
+            transition: 'all 0.18s ease',
+            boxShadow: '0 2px 5px rgba(234, 88, 12, 0.1)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#ea580c';
+            e.currentTarget.style.color = '#ffffff';
+            e.currentTarget.style.borderColor = '#ea580c';
+            e.currentTarget.style.boxShadow = '0 3px 8px rgba(234, 88, 12, 0.3)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = launcherOpen ? '#fff7ed' : '#f8fafc';
+            e.currentTarget.style.color = '#ea580c';
+            e.currentTarget.style.borderColor = '#fed7aa';
+            e.currentTarget.style.boxShadow = '0 2px 5px rgba(234, 88, 12, 0.1)';
+          }}
+        >
+          <FaEllipsisV style={{ fontSize: '1rem' }} />
+        </button>
+
+        {/* Global Quick Launcher Drawer (Available on ALL pages) */}
+        <QuickLauncherDrawer isOpen={launcherOpen} onClose={() => setLauncherOpen(false)} />
+
         <Link
           to="/"
           style={{
