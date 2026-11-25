@@ -1,21 +1,15 @@
 # ==============================================================================
 # infra/aws/terraform/main.tf — CampusConnect Cloud Infrastructure (AWS)
-# Declarative Infrastructure as Code (IaC) provisioning AWS Free Tier resources.
+# Industry-Standard Declarative Infrastructure as Code (IaC)
+# Demonstrates: Data Sources, S3 Storage, IAM Least Privilege, Security Groups, EC2
 # ==============================================================================
 
-terraform {
-  required_version = ">= 1.5.0"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
+# ------------------------------------------------------------------------------
+# 0. DATA SOURCES (Dynamic Account & Environment Inspection)
+# ------------------------------------------------------------------------------
+data "aws_caller_identity" "current" {}
 
-provider "aws" {
-  region = var.aws_region
-}
+data "aws_region" "current" {}
 
 # ------------------------------------------------------------------------------
 # 1. S3 STORAGE BUCKET (Private, Encrypted, Least Privilege)
@@ -24,9 +18,7 @@ resource "aws_s3_bucket" "campusconnect_storage" {
   bucket = var.s3_bucket_name
 
   tags = {
-    Name        = "CampusConnect Storage"
-    Environment = "Production"
-    Project     = "CampusConnect"
+    Name = "CampusConnect Storage"
   }
 }
 
@@ -77,15 +69,15 @@ resource "aws_iam_role_policy" "s3_least_privilege" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "ListBucket"
-        Effect = "Allow"
-        Action = ["s3:ListBucket", "s3:GetBucketLocation"]
+        Sid      = "AllowS3BucketListing"
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket", "s3:GetBucketLocation"]
         Resource = aws_s3_bucket.campusconnect_storage.arn
       },
       {
-        Sid    = "ReadWriteObjects"
-        Effect = "Allow"
-        Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
+        Sid      = "AllowS3ObjectReadWrite"
+        Effect   = "Allow"
+        Action   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
         Resource = "${aws_s3_bucket.campusconnect_storage.arn}/*"
       }
     ]
@@ -98,15 +90,14 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 }
 
 # ------------------------------------------------------------------------------
-# 3. SECURITY GROUP (Virtual Firewall)
+# 3. SECURITY GROUP (Virtual Stateful Firewall)
 # ------------------------------------------------------------------------------
 resource "aws_security_group" "web_sg" {
   name        = "campusconnect-sg"
-  description = "CampusConnect Web and API Inbound Traffic Filter"
+  description = "CampusConnect Web and API Security Group"
   vpc_id      = var.vpc_id
 
   ingress {
-    description = "HTTP Public Web Traffic"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -114,7 +105,6 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
-    description = "Node.js Backend API Traffic"
     from_port   = 5000
     to_port     = 5000
     protocol    = "tcp"
@@ -122,7 +112,6 @@ resource "aws_security_group" "web_sg" {
   }
 
   ingress {
-    description = "SSH Administration"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -142,19 +131,29 @@ resource "aws_security_group" "web_sg" {
 }
 
 # ------------------------------------------------------------------------------
-# 4. COMPUTE (EC2 Virtual Machine - AWS Free Tier)
+# 4. COMPUTE (EC2 Virtual Machine - AWS Free Tier t3.micro)
 # ------------------------------------------------------------------------------
 resource "aws_instance" "app_server" {
-  ami                  = var.ami_id
-  instance_type        = var.instance_type
-  key_name             = var.key_name
-  subnet_id            = var.subnet_id
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  key_name               = var.key_name
+  subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
-  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
-  user_data            = file("${path.module}/../user_data.sh")
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
+  user_data              = file("${path.module}/../user_data.sh")
+
+  root_block_device {
+    volume_size           = 8
+    volume_type           = "gp3"
+    delete_on_termination = true
+  }
+
+  lifecycle {
+    # Prevent changing bootstrap script later from destroying a running prod VM
+    ignore_changes = [user_data]
+  }
 
   tags = {
-    Name    = "CampusConnect-Production-Server"
-    Project = "CampusConnect"
+    Name = "CampusConnect-Production-Server"
   }
 }

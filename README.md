@@ -19,6 +19,7 @@
 | **Phase 2** | **Containerization** | Docker, Multi-Stage Builds, Docker Compose, Volumes, Networks | [Phase 2 Guide](docs/PHASE_2_DOCKER.md) |
 | **Phase 3** | **CI/CD Automation** | GitHub Actions, Unit Testing (`node:test`), GHCR Container Registry | [Phase 3 Guide](docs/PHASE_3_CICD.md) |
 | **Phase 4** | **Cloud Computing** | AWS EC2 (t3.micro), VPC, Security Groups, S3 Encrypted Storage, IAM | [Phase 4 Guide](docs/PHASE_4_CLOUD_COMPUTING.md) |
+| **Phase 5** | **Infrastructure as Code** | Terraform HCL, State Management (`terraform.tfstate`), `plan`/`apply`/`destroy` | [Phase 5 Guide](docs/PHASE_5_TERRAFORM.md) |
 
 ---
 

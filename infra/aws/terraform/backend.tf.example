@@ -1,0 +1,14 @@
+# ==============================================================================
+# infra/aws/terraform/backend.tf.example — Remote State Storage (Team Best Practice)
+# Rename to backend.tf if enabling remote S3 state instead of local terraform.tfstate
+# ==============================================================================
+
+# terraform {
+#   backend "s3" {
+#     bucket       = "campusconnect-storage-343980058788"
+#     key          = "terraform/prod/campusconnect.tfstate"
+#     region       = "us-east-1"
+#     encrypt      = true
+#     use_lockfile = true
+#   }
+# }
