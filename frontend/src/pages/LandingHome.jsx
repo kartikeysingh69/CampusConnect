@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getJobs, googleSsoLogin } from '../services/api';
 import CompanyLogo from '../components/CompanyLogo';
+import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import {
   FaSearch,
@@ -40,6 +41,15 @@ export default function LandingHome() {
   const [heroSearch, setHeroSearch] = useState('');
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [contactSent, setContactSent] = useState(false);
+  const [qrMode, setQrMode] = useState('portal');
+
+  const livePortalUrl =
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+      ? `${window.location.origin}/jobs`
+      : 'http://13.220.8.8/jobs';
+  const qrValue = qrMode === 'github' ? 'https://github.com/kartikeysingh69/CampusConnect' : livePortalUrl;
 
   useEffect(() => {
     getJobs()
@@ -619,7 +629,7 @@ export default function LandingHome() {
                         gap: '5px'
                       }}
                     >
-                      <FaMoneyBillWave /> {job.salary_range || 'Competitive CTC'}
+                      <FaMoneyBillWave /> {job.ctc || job.salary_range || 'Competitive CTC'}
                     </span>
                     <span
                       style={{
@@ -1230,7 +1240,7 @@ export default function LandingHome() {
             </form>
           </div>
 
-          {/* Column 3: Interactive QR Code (Warm Orange Highlights) */}
+          {/* Column 3: Interactive Scannable QR Code (ISO/IEC 18004 Real QR) */}
           <div
             style={{
               background: '#1e293b',
@@ -1244,53 +1254,74 @@ export default function LandingHome() {
               justifyContent: 'center'
             }}
           >
-            <div
+            <a
+              href={qrValue}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={`Scan or click to open: ${qrValue}`}
               style={{
                 background: '#ffffff',
                 padding: '10px',
                 borderRadius: '12px',
                 boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-                marginBottom: '0.85rem'
+                marginBottom: '0.85rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             >
-              {/* Scalable High-Fidelity SVG QR Code */}
-              <svg width="130" height="130" viewBox="0 0 130 130">
-                <rect width="130" height="130" fill="#ffffff" />
-                {/* Top-Left */}
-                <rect x="10" y="10" width="35" height="35" fill="#0f172a" rx="4" />
-                <rect x="16" y="16" width="23" height="23" fill="#ffffff" rx="2" />
-                <rect x="22" y="22" width="11" height="11" fill="#ea580c" rx="1" />
-                {/* Top-Right */}
-                <rect x="85" y="10" width="35" height="35" fill="#0f172a" rx="4" />
-                <rect x="91" y="16" width="23" height="23" fill="#ffffff" rx="2" />
-                <rect x="97" y="22" width="11" height="11" fill="#ea580c" rx="1" />
-                {/* Bottom-Left */}
-                <rect x="10" y="85" width="35" height="35" fill="#0f172a" rx="4" />
-                <rect x="16" y="91" width="23" height="23" fill="#ffffff" rx="2" />
-                <rect x="22" y="97" width="11" height="11" fill="#ea580c" rx="1" />
-                {/* Data Modules */}
-                <rect x="52" y="15" width="8" height="8" fill="#0f172a" />
-                <rect x="68" y="15" width="8" height="8" fill="#0f172a" />
-                <rect x="52" y="32" width="8" height="8" fill="#ea580c" />
-                <rect x="68" y="32" width="8" height="8" fill="#0f172a" />
-                <rect x="15" y="52" width="8" height="8" fill="#0f172a" />
-                <rect x="32" y="52" width="8" height="8" fill="#ea580c" />
-                <rect x="52" y="52" width="24" height="24" rx="4" fill="#c2410c" />
-                <rect x="85" y="52" width="8" height="8" fill="#0f172a" />
-                <rect x="102" y="52" width="8" height="8" fill="#0f172a" />
-                <rect x="52" y="85" width="8" height="8" fill="#0f172a" />
-                <rect x="68" y="85" width="8" height="8" fill="#ea580c" />
-                <rect x="85" y="85" width="8" height="8" fill="#0f172a" />
-                <rect x="102" y="102" width="8" height="8" fill="#0f172a" />
-                <rect x="68" y="102" width="8" height="8" fill="#0f172a" />
-                <rect x="52" y="102" width="8" height="8" fill="#ea580c" />
-              </svg>
+              <QRCodeSVG
+                value={qrValue}
+                size={132}
+                bgColor="#ffffff"
+                fgColor="#0f172a"
+                level="M"
+                includeMargin={false}
+              />
+            </a>
+
+            <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.6rem' }}>
+              <button
+                type="button"
+                onClick={() => setQrMode('portal')}
+                style={{
+                  padding: '3px 10px',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  borderRadius: '999px',
+                  border: '1px solid',
+                  cursor: 'pointer',
+                  borderColor: qrMode === 'portal' ? '#ea580c' : '#475569',
+                  background: qrMode === 'portal' ? '#ea580c' : 'transparent',
+                  color: qrMode === 'portal' ? '#ffffff' : '#cbd5e1'
+                }}
+              >
+                Live Portal
+              </button>
+              <button
+                type="button"
+                onClick={() => setQrMode('github')}
+                style={{
+                  padding: '3px 10px',
+                  fontSize: '0.7rem',
+                  fontWeight: 700,
+                  borderRadius: '999px',
+                  border: '1px solid',
+                  cursor: 'pointer',
+                  borderColor: qrMode === 'github' ? '#ea580c' : '#475569',
+                  background: qrMode === 'github' ? '#ea580c' : 'transparent',
+                  color: qrMode === 'github' ? '#ffffff' : '#cbd5e1'
+                }}
+              >
+                GitHub Repo
+              </button>
             </div>
+
             <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#ffffff', marginBottom: '3px' }}>
-              Mobile Placement Handbook
+              {qrMode === 'github' ? 'Project Source & DevOps Docs' : 'Mobile Placement Handbook'}
             </div>
             <div style={{ fontSize: '0.74rem', color: '#fed7aa', lineHeight: 1.4 }}>
-              Scan QR code with your mobile camera for drive alerts & schedules
+              Scan QR code with your mobile camera for {qrMode === 'github' ? 'GitHub repo & docs' : 'live drive alerts & schedules'}
             </div>
           </div>
         </div>
