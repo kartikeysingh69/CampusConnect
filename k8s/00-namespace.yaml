@@ -1,0 +1,10 @@
+# ==============================================================================
+# k8s/00-namespace.yaml — Isolated CampusConnect Kubernetes Namespace
+# ==============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: campusconnect
+  labels:
+    app.kubernetes.io/name: campusconnect
+    app.kubernetes.io/part-of: campusconnect-platform

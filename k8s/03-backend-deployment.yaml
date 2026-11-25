@@ -1,0 +1,88 @@
+# ==============================================================================
+# k8s/03-backend-deployment.yaml — Node.js Express Backend API + ClusterIP
+# Features: High Availability (2 replicas), Self-Healing Probes, Resource Limits.
+# Service named "backend" matches Nginx reverse proxy (http://backend:5000).
+# ==============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campusconnect-backend
+  namespace: campusconnect
+  labels:
+    app: campusconnect-backend
+    tier: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: campusconnect-backend
+  template:
+    metadata:
+      labels:
+        app: campusconnect-backend
+        tier: backend
+    spec:
+      containers:
+        - name: backend
+          image: miniproject-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+              name: http
+          envFrom:
+            - configMapRef:
+                name: campusconnect-config
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: campusconnect-secrets
+                  key: DB_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: campusconnect-secrets
+                  key: JWT_SECRET
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: campusconnect
+  labels:
+    app: campusconnect-backend
+spec:
+  type: ClusterIP # Internal service reachable at http://backend:5000 by Nginx frontend
+  selector:
+    app: campusconnect-backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP

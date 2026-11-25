@@ -1,0 +1,102 @@
+# ==============================================================================
+# k8s/02-mysql-deployment.yaml — Stateful MySQL 8.4 Database + ClusterIP Service
+# Note: ClusterIP ensures DB is reachable ONLY inside the cluster (Zero Trust).
+# ==============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: campusconnect
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: campusconnect
+  labels:
+    app: mysql
+    tier: database
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # Prevents multi-attach lock conflicts on ReadWriteOnce PVC
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+        tier: database
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.4
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+              name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: campusconnect-secrets
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: campusconnect-config
+                  key: DB_NAME
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+            - name: mysql-init-script
+              mountPath: /docker-entrypoint-initdb.d
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "768Mi"
+          readinessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+        - name: mysql-init-script
+          configMap:
+            name: mysql-init-sql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: campusconnect
+  labels:
+    app: mysql
+spec:
+  type: ClusterIP # Internal cluster DNS only: mysql.campusconnect.svc.cluster.local
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP

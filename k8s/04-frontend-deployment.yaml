@@ -1,0 +1,90 @@
+# ==============================================================================
+# k8s/04-frontend-deployment.yaml — Nginx SPA Frontend + NodePort & LoadBalancer
+# Demonstrates both NodePort (local Minikube port 30080) and LoadBalancer service.
+# ==============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: campusconnect-frontend
+  namespace: campusconnect
+  labels:
+    app: campusconnect-frontend
+    tier: frontend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: campusconnect-frontend
+  template:
+    metadata:
+      labels:
+        app: campusconnect-frontend
+        tier: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: miniproject-frontend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-nodeport
+  namespace: campusconnect
+  labels:
+    app: campusconnect-frontend
+spec:
+  type: NodePort # Exposes frontend on worker node IP at static port 30080
+  selector:
+    app: campusconnect-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-loadbalancer
+  namespace: campusconnect
+  labels:
+    app: campusconnect-frontend
+spec:
+  type: LoadBalancer # Cloud LB (AWS ELB / GCP LB / minikube tunnel)
+  selector:
+    app: campusconnect-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
