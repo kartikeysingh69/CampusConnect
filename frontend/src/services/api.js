@@ -2,8 +2,18 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
 });
+
+/**
+ * Resolves uploaded asset paths (/uploads/...) against optional env origin or current host.
+ */
+export const resolveAssetUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const base = import.meta.env.VITE_ASSET_URL || '';
+  return `${base}${url}`;
+};
 
 // Har request me JWT token attach karo (agar logged in hai)
 API.interceptors.request.use((config) => {

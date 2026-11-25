@@ -1,7 +1,7 @@
 // src/pages/Profile.jsx — Student Profile Workspace (Dynamic per logged-in user, warm orange light theme)
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProfile, updateProfile, uploadResume, deleteResume } from '../services/api';
+import { getProfile, updateProfile, uploadResume, deleteResume, resolveAssetUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import {
@@ -70,11 +70,7 @@ export default function Profile() {
   const [uploadingResume, setUploadingResume] = useState(false);
 
   // Helper for full resume URL (handles local /uploads and external http links)
-  const getFullResumeUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    return `http://localhost:5000${url}`;
-  };
+  const getFullResumeUrl = (url) => resolveAssetUrl(url);
 
   // Dynamic initial profile state — NO hardcoded data of other students
   const [profile, setProfile] = useState({

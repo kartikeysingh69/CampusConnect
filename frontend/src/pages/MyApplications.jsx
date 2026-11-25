@@ -1,6 +1,6 @@
 // src/pages/MyApplications.jsx — Real-time Application Tracking, Visual Timeline, Interviews & Offer Letters
 import { useState, useEffect, useMemo } from 'react';
-import { getMyApplications, withdrawApplication, getMyInterviews } from '../services/api';
+import { getMyApplications, withdrawApplication, getMyInterviews, resolveAssetUrl } from '../services/api';
 import CompanyLogo from '../components/CompanyLogo';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
@@ -91,11 +91,7 @@ export default function MyApplications() {
     fetchApplications();
   }, []);
 
-  const getResumeUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    return `http://localhost:5000${url}`;
-  };
+  const getResumeUrl = (url) => resolveAssetUrl(url);
 
   // Filtered Applications
   const filteredApps = useMemo(() => {
@@ -665,11 +661,7 @@ export default function MyApplications() {
 
                     {app.offer_letter_url ? (
                       <a
-                        href={
-                          app.offer_letter_url.startsWith('http')
-                            ? app.offer_letter_url
-                            : `http://localhost:5000${app.offer_letter_url}`
-                        }
+                        href={resolveAssetUrl(app.offer_letter_url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
@@ -843,11 +835,7 @@ export default function MyApplications() {
                       {app.offer_letter_url && (
                         <div style={{ marginTop: '0.4rem' }}>
                           <a
-                            href={
-                              app.offer_letter_url.startsWith('http')
-                                ? app.offer_letter_url
-                                : `http://localhost:5000${app.offer_letter_url}`
-                            }
+                            href={resolveAssetUrl(app.offer_letter_url)}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{

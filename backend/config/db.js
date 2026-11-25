@@ -7,6 +7,7 @@ require('dotenv').config();
 // Connection pool banao (ek pool = ek group of connections, faster hota hai)
 const pool = mysql.createPool({
   host: process.env.DB_HOST,         // localhost
+  port: Number(process.env.DB_PORT) || 3306,
   user: process.env.DB_USER,         // root
   password: process.env.DB_PASSWORD, // aapka mysql password
   database: process.env.DB_NAME,     // campusconnect
