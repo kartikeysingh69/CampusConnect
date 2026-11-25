@@ -43,8 +43,6 @@ backups/
 *.sha256
 
 # Editor & Tooling Caches
-.kilo/
-.kombai/
 .DS_Store
 Thumbs.db
 .vscode/

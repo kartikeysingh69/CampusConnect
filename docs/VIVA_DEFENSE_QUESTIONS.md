@@ -54,4 +54,4 @@
 **Answer:** The system aggregates live placement statistics directly from the database: Total eligible cohort, total placed candidates, domestic highest package, average package, and median package (NIRF GPH parameter). It also compiles the discipline-wise conversion matrix compliant with NAAC Key Indicator 5.2.1 and renders a print-ready document formatted with institutional letterhead.
 
 #### Q12: What happens if an external examiner asks you to show the Docker deployment?
-**Answer:** The project contains a `docker-compose.yml` file configuring three isolated containers: `db` (MySQL 8.4), `backend` (Node 20 Alpine), and `frontend` (Nginx Alpine). Executing `docker compose up -d` starts the entire production stack in under 60 seconds.
+**Answer:** The project contains a `docker-compose.yml` file configuring three isolated containers: `db` (MySQL 8.4), `backend` (Node 22 Alpine), and `frontend` (Nginx Alpine). Executing `docker compose up -d` starts the entire production stack in under 60 seconds.
