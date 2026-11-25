@@ -14,7 +14,7 @@ CampusConnect is an enterprise-grade, end-to-end web portal engineered to stream
 ## 2. System Architecture & Tech Stack
 
 ### 2.1 Technology Stack
-- **Frontend Presentation Layer:** React 19 + Vite, React Router DOM v7, React Hot Toast, React Icons, Three.js (dynamic interactive mesh canvas).
+- **Frontend Presentation Layer:** React 19 + Vite, React Router DOM v7, React Hot Toast, React Icons, HTML5 Canvas 2D with custom 3D projection engine (`Background3D.jsx`).
 - **Backend Application Layer:** Node.js, Express.js (RESTful API architecture, JWT authentication middleware, Multer multipart storage).
 - **Data Persistence Layer:** MySQL 8.4 Community Server (InnoDB Storage Engine, Connection Pooling, Foreign Key constraints with Cascading Deletes).
 - **Notification & Communication Engine:** Real-time polling notification center, Nodemailer automated email dispatch, and RFC 5545 `.ics` Google Calendar invite generator.

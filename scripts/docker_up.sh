@@ -43,8 +43,8 @@ done
 echo -e "\n${GREEN}====================================================${NC}"
 echo -e "${GREEN}🎉 CampusConnect Stack is Active & Ready!${NC}"
 echo -e "${GREEN}Frontend Web:  http://localhost${NC}"
-echo -e "${GREEN}Backend API:   http://localhost:5000/api/health${NC}"
-echo -e "${GREEN}MySQL Server:  localhost:3306 (user: root)${NC}"
+echo -e "${GREEN}Backend API:   http://localhost:${BACKEND_PORT_BINDING:-5001}/api/health${NC}"
+echo -e "${GREEN}MySQL Server:  localhost:${DB_PORT_BINDING:-3307} (user: root)${NC}"
 echo -e "${GREEN}====================================================${NC}"
 
 docker compose ps

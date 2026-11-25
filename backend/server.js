@@ -10,7 +10,7 @@ const db = require('./config/db');
 const { metricsMiddleware, metricsHandler } = require('./middleware/metrics');
 
 // .env file se secrets load karo (jaise DB password, JWT key)
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -61,8 +61,13 @@ app.use('/api/assessment', assessmentRoutes); // /api/assessment (In-browser cod
 app.use('/api/messages', messageRoutes);       // /api/messages (1-on-1 direct chat)
 app.use('/api/admin', adminBatchRoutes);      // /api/admin/import-students (batch CSV importer)
 
-// ---- Prometheus Metrics Scrape Endpoint ----
+// ---- Prometheus Metrics Scrape Endpoint & Alertmanager Webhook ----
 app.get('/metrics', metricsHandler);
+app.post('/api/alerts/webhook', (req, res) => {
+  const alerts = Array.isArray(req.body?.alerts) ? req.body.alerts : [];
+  console.log(`🚨 Alertmanager Webhook received (${alerts.length} alert(s))`);
+  res.json({ received: true, alertCount: alerts.length });
+});
 
 // ---- Health Check Route (Test karne ke liye) ----
 app.get('/', (req, res) => {
@@ -97,6 +102,7 @@ if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`✅ CampusConnect Server running at http://localhost:${PORT}`);
     console.log(`📋 Environment: ${process.env.NODE_ENV}`);
+    db.waitForConnection();
   });
 }
 

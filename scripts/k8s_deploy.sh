@@ -22,8 +22,14 @@ echo -e "${BLUE}======================================================${NC}"
 echo -e "\n${YELLOW}[1/5] Checking Kubernetes cluster status...${NC}"
 kubectl cluster-info
 
-# 2. Load locally built Docker images into Minikube container runtime
+# 2. Build/tag if needed and load Docker images into Minikube container runtime
 echo -e "\n${YELLOW}[2/5] Loading Docker images into Minikube...${NC}"
+if ! docker image inspect miniproject-backend:latest >/dev/null 2>&1; then
+  docker build -t miniproject-backend:latest -f backend/Dockerfile .
+fi
+if ! docker image inspect miniproject-frontend:latest >/dev/null 2>&1; then
+  docker build -t miniproject-frontend:latest -f frontend/Dockerfile .
+fi
 minikube image load miniproject-backend:latest
 minikube image load miniproject-frontend:latest
 minikube image load mysql:8.4

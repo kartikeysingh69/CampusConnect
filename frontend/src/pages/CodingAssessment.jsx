@@ -162,6 +162,10 @@ export default function CodingAssessment() {
 
   const handleSubmitFinal = async () => {
     if (!selectedProblem) return;
+    if (!localStorage.getItem('token')) {
+      toast.error('Please login first to save your assessment submission.');
+      return;
+    }
     setIsSubmitting(true);
 
     let passed = testResults?.passedCount ?? selectedProblem.testCases.length;
@@ -459,8 +463,13 @@ export default function CodingAssessment() {
                   }}
                 >
                   <option value="javascript">JavaScript (ES6)</option>
-                  <option value="python">Python 3</option>
+                  <option value="python">Python 3 (Simulated)</option>
                 </select>
+                {language === 'python' && (
+                  <span style={{ fontSize: '0.74rem', color: '#fbbf24', fontWeight: 600 }}>
+                    Preview simulator (use JS for live execution)
+                  </span>
+                )}
               </div>
 
               <div style={{ display: 'flex', gap: '0.65rem' }}>

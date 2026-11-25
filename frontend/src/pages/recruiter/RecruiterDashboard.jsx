@@ -8,7 +8,8 @@ import {
   postRecruiterDrive,
   submitEvaluation,
   scheduleInterview,
-  issueOfferLetter
+  issueOfferLetter,
+  resolveAssetUrl
 } from '../../services/api';
 import CompanyLogo from '../../components/CompanyLogo';
 import toast from 'react-hot-toast';
@@ -71,7 +72,7 @@ export default function RecruiterDashboard() {
     round_type: 'Technical Interview',
     scheduled_date: '',
     duration_minutes: 45,
-    mode: 'Online Video Call',
+    mode: 'Online',
     location_or_link: 'https://meet.google.com/campus-eval',
     notes: ''
   });
@@ -435,7 +436,7 @@ export default function RecruiterDashboard() {
                         <div style={{ fontSize: '0.8rem', color: '#64748b' }}>{app.student_email}</div>
                         {app.student_resume && (
                           <a
-                            href={app.student_resume.startsWith('http') ? app.student_resume : `http://localhost:5000${app.student_resume}`}
+                            href={resolveAssetUrl(app.student_resume)}
                             target="_blank"
                             rel="noopener noreferrer"
                             style={{ fontSize: '0.74rem', color: '#ea580c', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.2rem' }}
@@ -1048,6 +1049,39 @@ export default function RecruiterDashboard() {
                 </div>
               </div>
 
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                    Interview Mode
+                  </label>
+                  <select
+                    value={interviewForm.mode}
+                    onChange={(e) => setInterviewForm({ ...interviewForm, mode: e.target.value })}
+                    style={{ width: '100%', padding: '0.55rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  >
+                    <option value="Online">Online</option>
+                    <option value="In-Person / Campus">In-Person / Campus</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                    Round Type
+                  </label>
+                  <select
+                    value={interviewForm.round_type}
+                    onChange={(e) => setInterviewForm({ ...interviewForm, round_type: e.target.value })}
+                    style={{ width: '100%', padding: '0.55rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                  >
+                    <option value="Online Assessment">Online Assessment</option>
+                    <option value="Technical Interview">Technical Interview</option>
+                    <option value="HR Interview">HR Interview</option>
+                    <option value="Managerial Round">Managerial Round</option>
+                    <option value="Group Discussion">Group Discussion</option>
+                  </select>
+                </div>
+              </div>
+
               <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#334155', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
                   Meeting Link / Venue *
@@ -1176,10 +1210,10 @@ export default function RecruiterDashboard() {
                   Formal Offer Letter Cloud URL or PDF Link
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   value={offerForm.offer_letter_url}
                   onChange={(e) => setOfferForm({ ...offerForm, offer_letter_url: e.target.value })}
-                  placeholder="https://drive.google.com/... or cloud link"
+                  placeholder="https://drive.google.com/... or /uploads/offer-letter.pdf"
                   style={{ width: '100%', padding: '0.55rem', borderRadius: '8px', border: '1px solid #cbd5e1' }}
                 />
               </div>

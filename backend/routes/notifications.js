@@ -4,8 +4,17 @@ const router = express.Router();
 const db = require('../config/db');
 const verifyToken = require('../middleware/auth');
 
-// Utility function to create a notification programmatically from any route
-async function sendNotification({ userId, title, message, type = 'general', link = null }) {
+// Utility function to create a notification programmatically from any route.
+// Accepts either an options object or positional args (userId, title, message, type, link).
+async function sendNotification(arg1, titleArg, messageArg, typeArg = 'general', linkArg = null) {
+  const payload =
+    arg1 && typeof arg1 === 'object'
+      ? arg1
+      : { userId: arg1, title: titleArg, message: messageArg, type: typeArg, link: linkArg };
+
+  const { userId, title, message, type = 'general', link = null } = payload;
+  if (!userId || !title || !message) return;
+
   try {
     await db.query(
       'INSERT INTO notifications (user_id, title, message, type, link) VALUES (?, ?, ?, ?, ?)',

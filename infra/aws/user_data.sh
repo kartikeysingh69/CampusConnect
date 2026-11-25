@@ -22,9 +22,10 @@ mkdir -p $DOCKER_CONFIG/cli-plugins
 curl -SL https://github.com/docker/compose/releases/download/v2.29.1/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
 chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 
-# 5. Clone repository or download docker-compose
-mkdir -p /opt/campusconnect
+# 5. Download initial database schema and configure production compose
+mkdir -p /opt/campusconnect/backend/config
 cd /opt/campusconnect
+curl -fsSL https://raw.githubusercontent.com/kartikeysingh69/CampusConnect/main/backend/config/init.sql -o /opt/campusconnect/backend/config/init.sql || true
 
 cat << 'EOF' > docker-compose.prod.yml
 services:
@@ -39,6 +40,13 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./backend/config/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   backend:
     image: ghcr.io/kartikeysingh69/campusconnect-backend:latest
@@ -55,7 +63,8 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   frontend:
     image: ghcr.io/kartikeysingh69/campusconnect-frontend:latest

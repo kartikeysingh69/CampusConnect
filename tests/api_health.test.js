@@ -20,6 +20,35 @@ describe('CampusConnect Application Core Routing', () => {
     assert.ok(routes.includes('/'), 'Root "/" route must be registered');
     assert.ok(routes.includes('/api/health'), 'Health check "/api/health" route must be registered');
     assert.ok(routes.includes('/metrics'), 'Prometheus "/metrics" route must be registered');
+    assert.ok(routes.includes('/api/alerts/webhook'), 'Alertmanager webhook route must be registered');
+  });
+
+  it('should accept both object and positional arguments in sendNotification safely', async () => {
+    const db = require('../backend/config/db');
+    const originalQuery = db.query;
+    const calls = [];
+    db.query = async (sql, params) => {
+      calls.push({ sql, params });
+      return [{ insertId: 1 }];
+    };
+
+    try {
+      const { sendNotification } = require('../backend/routes/notifications');
+      await sendNotification({
+        userId: 7,
+        title: 'Object Test',
+        message: 'Testing object payload',
+        type: 'status_update',
+        link: '/my-applications'
+      });
+      await sendNotification(8, 'Positional Test', 'Testing positional payload', 'drive', '/jobs/1');
+
+      assert.strictEqual(calls.length, 2);
+      assert.deepStrictEqual(calls[0].params, [7, 'Object Test', 'Testing object payload', 'status_update', '/my-applications']);
+      assert.deepStrictEqual(calls[1].params, [8, 'Positional Test', 'Testing positional payload', 'drive', '/jobs/1']);
+    } finally {
+      db.query = originalQuery;
+    }
   });
 
   it('should expose valid Prometheus metrics exposition text from metricsHandler', async () => {

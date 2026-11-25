@@ -32,8 +32,8 @@ router.post('/import-students', verifyToken, requireAdmin, async (req, res) => {
     for (const st of students) {
       const name = st.name || st.Name;
       const email = (st.email || st.Email || '').trim().toLowerCase();
-      const branch = st.branch || st.Branch || 'Computer Science';
-      const cgpa = parseFloat(st.cgpa || st.CGPA || '7.5');
+      const branch = st.branch || st.Branch || st.department || st.Department || 'Computer Science';
+      const cgpa = parseFloat(st.cgpa ?? st.CGPA ?? '7.5');
       const college_id = st.college_id || st.RollNo || st['Roll Number'] || null;
       const graduation_year = parseInt(st.graduation_year || st.Year || '2026', 10);
 
@@ -63,7 +63,9 @@ router.post('/import-students', verifyToken, requireAdmin, async (req, res) => {
     res.status(201).json({
       message: `✅ Batch import completed! Successfully registered ${importedCount} student(s).`,
       importedCount,
+      inserted: importedCount,
       skippedCount,
+      skipped: skippedCount,
       skippedEmails,
       defaultPassword: 'student@2026'
     });

@@ -77,6 +77,8 @@ router.put('/', verifyToken, async (req, res) => {
 
   try {
     const serializedMeta = student_meta ? (typeof student_meta === 'string' ? student_meta : JSON.stringify(student_meta)) : null;
+    const safeCgpa = cgpa === '' || cgpa === undefined ? null : cgpa;
+    const safeGradYear = graduation_year === '' || graduation_year === undefined ? null : graduation_year;
     await db.query(
       `UPDATE users SET 
         name = COALESCE(?, name), 
@@ -94,19 +96,19 @@ router.put('/', verifyToken, async (req, res) => {
         resume_url = COALESCE(?, resume_url)
        WHERE id = ?`,
       [
-        name,
-        cgpa,
-        branch,
-        phone,
-        github,
-        linkedin,
-        skills,
-        bio,
-        graduation_year,
-        college_id,
-        profile_pic,
+        name || null,
+        safeCgpa,
+        branch ?? null,
+        phone ?? null,
+        github ?? null,
+        linkedin ?? null,
+        skills ?? null,
+        bio ?? null,
+        safeGradYear,
+        college_id ?? null,
+        profile_pic ?? null,
         serializedMeta,
-        resume_url,
+        resume_url ?? null,
         req.user.id
       ]
     );

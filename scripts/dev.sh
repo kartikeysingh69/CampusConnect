@@ -21,17 +21,17 @@ echo -e "${CYAN}🚀 CampusConnect Local Dev Environment Starter${NC}"
 echo -e "${CYAN}====================================================${NC}"
 
 # Check for .env file
-if [ ! -f backend/.env ]; then
-  echo -e "${YELLOW}⚠️ backend/.env not found! Creating from example...${NC}"
-  if [ -f backend/.env.example ]; then
-    cp backend/.env.example backend/.env
+if [ ! -f .env ]; then
+  echo -e "${YELLOW}⚠️ .env not found! Creating from .env.example...${NC}"
+  if [ -f .env.example ]; then
+    cp .env.example .env
   fi
 fi
 
 # Check Node modules
-if [ ! -d "node_modules" ] && [ ! -d "backend/node_modules" ]; then
-  echo -e "${YELLOW}📦 Installing backend dependencies...${NC}"
-  (cd backend && npm install)
+if [ ! -d "node_modules" ]; then
+  echo -e "${YELLOW}📦 Installing root/backend dependencies...${NC}"
+  npm install
 fi
 
 if [ ! -d "frontend/node_modules" ]; then
@@ -50,7 +50,7 @@ cleanup() {
 
 trap cleanup SIGINT SIGTERM EXIT
 
-echo -e "${GREEN}Starting Backend Server on port 5000...${NC}"
+echo -e "${GREEN}Starting Backend Server on port ${PORT:-5001}...${NC}"
 (node backend/server.js) &
 BACKEND_PID=$!
 
@@ -61,7 +61,7 @@ echo -e "${GREEN}Starting Frontend Vite Dev Server on port 5173...${NC}"
 FRONTEND_PID=$!
 
 echo -e "${CYAN}====================================================${NC}"
-echo -e "${GREEN}✅ Backend API: http://localhost:5000${NC}"
+echo -e "${GREEN}✅ Backend API: http://localhost:${PORT:-5001}${NC}"
 echo -e "${GREEN}✅ Frontend UI: http://localhost:5173${NC}"
 echo -e "${YELLOW}Press [CTRL+C] at any time to stop all services.${NC}"
 echo -e "${CYAN}====================================================${NC}"

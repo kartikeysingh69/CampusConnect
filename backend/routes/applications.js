@@ -239,16 +239,16 @@ router.post('/:id/offer', verifyToken, async (req, res) => {
         joining_date = COALESCE(?, joining_date),
         offer_letter_url = COALESCE(?, offer_letter_url)
        WHERE id = ?`,
-      [offered_ctc, joining_date, offer_letter_url, req.params.id]
+      [offered_ctc || null, joining_date || null, offer_letter_url || null, req.params.id]
     );
 
-    await sendNotification(
-      app.student_id,
-      `📜 Official Offer Released: ${app.company}`,
-      `Your official offer letter for ${app.title} (${offered_ctc || 'As per norms'}) has been issued! You can download it directly from My Applications. Check your email for formal acceptance details.`,
-      'status_update',
-      '/my-applications'
-    );
+    await sendNotification({
+      userId: app.student_id,
+      title: `📜 Official Offer Released: ${app.company}`,
+      message: `Your official offer letter for ${app.title} (${offered_ctc || 'As per norms'}) has been issued! You can download it directly from My Applications. Check your email for formal acceptance details.`,
+      type: 'status_update',
+      link: '/my-applications'
+    });
 
     // Send celebratory formal offer letter email
     sendOfferLetterEmail(

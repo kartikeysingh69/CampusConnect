@@ -154,16 +154,21 @@ router.post('/submit', verifyToken, async (req, res) => {
         if (existingEval.length > 0) {
           await db.query(
             `UPDATE candidate_evaluations 
-             SET technical_skills = ?, problem_solving = ?, notes = CONCAT(notes, '\n', ?)
+             SET technical_score = ?, problem_solving_score = ?,
+                 feedback_notes = TRIM(BOTH '\n' FROM CONCAT(COALESCE(feedback_notes, ''), '\n', ?))
              WHERE application_id = ?`,
             [ratingOutOf5, ratingOutOf5, notes, appId]
           );
         } else {
+          const [evalUsers] = await db.query(
+            "SELECT id FROM users WHERE role IN ('admin', 'recruiter') ORDER BY id ASC LIMIT 1"
+          );
+          const recruiterId = evalUsers[0]?.id || req.user.id;
           await db.query(
             `INSERT INTO candidate_evaluations 
-             (application_id, evaluator_id, technical_skills, communication_skills, problem_solving, recommendation, notes)
-             VALUES (?, 1, ?, 4, ?, ?, ?)`,
-            [appId, ratingOutOf5, ratingOutOf5, scorePercent >= 70 ? 'hire' : 'hold', notes]
+             (application_id, recruiter_id, technical_score, communication_score, problem_solving_score, recommendation, feedback_notes)
+             VALUES (?, ?, ?, 4, ?, ?, ?)`,
+            [appId, recruiterId, ratingOutOf5, ratingOutOf5, scorePercent >= 70 ? 'hire' : 'hold', notes]
           );
         }
       }

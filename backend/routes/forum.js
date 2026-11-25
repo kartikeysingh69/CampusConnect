@@ -42,13 +42,13 @@ router.post('/announcements', verifyToken, async (req, res) => {
     try {
       const [students] = await db.query("SELECT id FROM users WHERE role = 'student'");
       for (const st of students) {
-        await sendNotification(
-          st.id,
-          `📢 TPO Notice: ${title}`,
-          message.slice(0, 140) + '...',
-          'announcement',
-          '/forum'
-        );
+        await sendNotification({
+          userId: st.id,
+          title: `📢 TPO Notice: ${title}`,
+          message: message.slice(0, 140) + (message.length > 140 ? '...' : ''),
+          type: 'announcement',
+          link: '/forum'
+        });
       }
     } catch (e) {
       console.warn('Announcement notification broadcast error:', e.message);

@@ -45,6 +45,8 @@ router.post('/', verifyToken, async (req, res) => {
 
     const { student_id, student_email, student_name, title, company } = apps[0];
 
+    const safeMode = mode === 'In-Person / Campus' ? 'In-Person / Campus' : 'Online';
+
     // Insert interview record
     const [result] = await db.query(
       `INSERT INTO interviews 
@@ -56,7 +58,7 @@ router.post('/', verifyToken, async (req, res) => {
         round_type || 'Technical Interview',
         scheduled_date,
         duration_minutes || 45,
-        mode || 'Online',
+        safeMode,
         location_or_link,
         notes || null
       ]
@@ -70,13 +72,13 @@ router.post('/', verifyToken, async (req, res) => {
 
     // Send automatic in-app notification to student
     const dateFormatted = new Date(scheduled_date).toLocaleString();
-    await sendNotification(
-      student_id,
-      `📅 Interview Scheduled: ${company}`,
-      `You have been scheduled for "${round_name}" (${round_type || 'Technical'}) on ${dateFormatted}. Mode: ${mode || 'Online'}. Check calendar invite in your email!`,
-      'interview_scheduled',
-      '/my-applications'
-    );
+    await sendNotification({
+      userId: student_id,
+      title: `📅 Interview Scheduled: ${company}`,
+      message: `You have been scheduled for "${round_name}" (${round_type || 'Technical'}) on ${dateFormatted}. Mode: ${safeMode}. Check calendar invite in your email!`,
+      type: 'interview_scheduled',
+      link: '/my-applications'
+    });
 
     // Send automated email invite with .ics Google/Outlook Calendar attachment
     sendInterviewInviteEmail(

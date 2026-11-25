@@ -27,7 +27,7 @@ git merge origin/main --ff-only
 
 # 2. Install production dependencies
 echo -e "${YELLOW}[2/5] Updating and installing production dependencies...${NC}"
-(cd backend && npm install --omit=dev)
+npm install --omit=dev
 (cd frontend && npm install)
 
 # 3. Compile and Build Frontend

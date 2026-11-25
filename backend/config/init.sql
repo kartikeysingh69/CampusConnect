@@ -159,7 +159,7 @@ CREATE TABLE IF NOT EXISTS notifications (
   user_id INT NOT NULL,
   title VARCHAR(255) NOT NULL,
   message TEXT NOT NULL,
-  type ENUM('status_update', 'new_job', 'interview_scheduled', 'general') DEFAULT 'general',
+  type ENUM('status_update', 'new_job', 'interview_scheduled', 'application', 'drive', 'announcement', 'message', 'general') DEFAULT 'general',
   link VARCHAR(255) DEFAULT NULL,
   is_read TINYINT(1) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -180,15 +180,17 @@ CREATE TABLE IF NOT EXISTS announcements (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Default Demo Accounts (Passwords hashed with bcrypt)
+-- Default Demo Accounts (Password for @campusconnect.edu & hr@amazon.com: password123)
+-- password for all seed users: password123
+-- hash: $2b$10$3SvAqmmPOkFnG4uQ7j4S.ugqRRz39X06IK1HI/4yN96VnwEbNpAkm
 INSERT IGNORE INTO users (name, email, password, role, cgpa, branch, company_name, skills)
 VALUES
-  ('Admin Officer', 'admin@campusconnect.edu', '$2b$10$JFejCFihVd0Z7LeTZqQkQuCEv/jujelCAMHi7mJ7m5cSj0g2i7XxS', 'admin', 9.50, 'Administration', NULL, NULL),
-  ('Placement Admin', 'admin@campus.edu', '$2b$10$JFejCFihVd0Z7LeTZqQkQuCEv/jujelCAMHi7mJ7m5cSj0g2i7XxS', 'admin', 9.50, 'Administration', NULL, NULL),
-  ('Kunal Sharma', 'kunal.sharma@campus.edu', '$2b$10$EdAWOJc3mAscR4q9hCMIFOWEXvLm.QpBXhcqa5q0eCr88vYMwBYSa', 'student', 8.90, 'Computer Science', NULL, 'React, Node.js, Docker, Kubernetes, AWS, Terraform, MySQL'),
-  ('Rohit Sharma', 'rohit@campusconnect.edu', '$2b$10$EdAWOJc3mAscR4q9hCMIFOWEXvLm.QpBXhcqa5q0eCr88vYMwBYSa', 'student', 8.75, 'Computer Science', NULL, 'Java, Spring Boot, React, SQL'),
-  ('Amazon University Recruiter', 'hr@amazon.com', '$2b$10$CufTsezWpEk3EJwVhcH6q.OGvZkvMJtdKntADtQYFmQf.aZvzepF.', 'recruiter', NULL, NULL, 'Amazon', NULL),
-  ('Google Talent Acquisition', 'recruiter@google.com', '$2b$10$CufTsezWpEk3EJwVhcH6q.OGvZkvMJtdKntADtQYFmQf.aZvzepF.', 'recruiter', NULL, NULL, 'Google', NULL);
+  ('Admin Officer', 'admin@campusconnect.edu', '$2b$10$3SvAqmmPOkFnG4uQ7j4S.ugqRRz39X06IK1HI/4yN96VnwEbNpAkm', 'admin', 9.50, 'Administration', NULL, NULL),
+  ('Placement Admin', 'admin@campus.edu', '$2b$10$3SvAqmmPOkFnG4uQ7j4S.ugqRRz39X06IK1HI/4yN96VnwEbNpAkm', 'admin', 9.50, 'Administration', NULL, NULL),
+  ('Kunal Sharma', 'kunal.sharma@campus.edu', '$2b$10$3SvAqmmPOkFnG4uQ7j4S.ugqRRz39X06IK1HI/4yN96VnwEbNpAkm', 'student', 8.90, 'Computer Science', NULL, 'React, Node.js, Docker, Kubernetes, AWS, Terraform, MySQL'),
+  ('Rohit Sharma', 'rohit@campusconnect.edu', '$2b$10$3SvAqmmPOkFnG4uQ7j4S.ugqRRz39X06IK1HI/4yN96VnwEbNpAkm', 'student', 8.75, 'Computer Science', NULL, 'Java, Spring Boot, React, SQL'),
+  ('Amazon University Recruiter', 'hr@amazon.com', '$2b$10$3SvAqmmPOkFnG4uQ7j4S.ugqRRz39X06IK1HI/4yN96VnwEbNpAkm', 'recruiter', NULL, NULL, 'Amazon', NULL),
+  ('Google Talent Acquisition', 'recruiter@google.com', '$2b$10$3SvAqmmPOkFnG4uQ7j4S.ugqRRz39X06IK1HI/4yN96VnwEbNpAkm', 'recruiter', NULL, NULL, 'Google', NULL);
 
 -- TPO Official Announcements (Idempotent Seed)
 INSERT INTO announcements (title, message, category, is_pinned)

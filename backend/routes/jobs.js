@@ -63,11 +63,11 @@ router.post('/', verifyToken, async (req, res) => {
       [
         title,
         company,
-        description,
-        location,
-        ctc,
-        deadline,
-        eligibility,
+        description || null,
+        location || null,
+        ctc || null,
+        deadline || null,
+        eligibility || null,
         stream || 'Computer Science',
         job_type || 'Full Time'
       ]
@@ -117,7 +117,19 @@ router.put('/:id', verifyToken, async (req, res) => {
         job_type = COALESCE(?, job_type),
         status = COALESCE(?, status)
        WHERE id = ?`,
-      [title, company, description, location, ctc, deadline, eligibility, stream, job_type, status, req.params.id]
+      [
+        title || null,
+        company || null,
+        description ?? null,
+        location ?? null,
+        ctc ?? null,
+        deadline || null,
+        eligibility ?? null,
+        stream || null,
+        job_type || null,
+        status || null,
+        req.params.id
+      ]
     );
     res.json({ message: '✅ Job updated successfully!' });
   } catch (err) {

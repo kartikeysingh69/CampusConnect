@@ -21,9 +21,14 @@ flowchart TD
         Router_Auth["Auth Router (/api/auth)"]
         Router_Jobs["Jobs Router (/api/jobs)"]
         Router_Apps["Applications Router (/api/applications)"]
+        Router_Profile["Profile & Uploads (/api/profile)"]
         Router_Interviews["Interviews Router (/api/interviews)"]
+        Router_Eval["Evaluations Router (/api/evaluations)"]
         Router_Recruiter["Recruiter Router (/api/recruiter)"]
         Router_Forum["Forum Router (/api/forum)"]
+        Router_Assessment["Coding Assessment (/api/assessment)"]
+        Router_Messages["Direct Chat (/api/messages)"]
+        Router_Assistant["CampusBot AI (/api/assistant)"]
         Router_Stats["Stats & NIRF Router (/api/stats)"]
         Email_Service["Nodemailer & .ics Calendar Engine"]
     end
@@ -40,18 +45,27 @@ flowchart TD
     Auth_Middleware --> Router_Auth
     Auth_Middleware --> Router_Jobs
     Auth_Middleware --> Router_Apps
+    Auth_Middleware --> Router_Profile
     Auth_Middleware --> Router_Interviews
+    Auth_Middleware --> Router_Eval
     Auth_Middleware --> Router_Recruiter
     Auth_Middleware --> Router_Forum
+    Auth_Middleware --> Router_Assessment
+    Auth_Middleware --> Router_Messages
+    Auth_Middleware --> Router_Assistant
     Auth_Middleware --> Router_Stats
     Router_Interviews --> Email_Service
     Router_Apps --> Email_Service
     Router_Jobs --> DB
     Router_Apps --> DB
+    Router_Profile --> DB
+    Router_Eval --> DB
     Router_Recruiter --> DB
     Router_Forum --> DB
+    Router_Assessment --> DB
+    Router_Messages --> DB
     Router_Stats --> DB
-    Router_Apps --> FileStore
+    Router_Profile --> FileStore
 ```
 
 ---
@@ -63,6 +77,8 @@ erDiagram
     USERS ||--o{ APPLICATIONS : "submits"
     USERS ||--o{ CANDIDATE_EVALUATIONS : "evaluates (as recruiter)"
     USERS ||--o{ DISCUSSIONS : "posts"
+    USERS ||--o{ ASSESSMENT_SUBMISSIONS : "submits"
+    USERS ||--o{ DIRECT_MESSAGES : "sends / receives"
     JOBS ||--o{ APPLICATIONS : "receives"
     JOBS ||--o{ DISCUSSIONS : "has"
     APPLICATIONS ||--o{ INTERVIEWS : "schedules"
@@ -148,6 +164,35 @@ erDiagram
         text message
         string category
         boolean is_pinned
+        timestamp created_at
+    }
+
+    ASSESSMENT_SUBMISSIONS {
+        int id PK
+        int student_id FK
+        int job_id FK
+        string problem_title
+        string language
+        int score_percent
+        timestamp created_at
+    }
+
+    DIRECT_MESSAGES {
+        int id PK
+        int sender_id FK
+        int receiver_id FK
+        text message
+        boolean is_read
+        timestamp created_at
+    }
+
+    NOTIFICATIONS {
+        int id PK
+        int user_id FK
+        string title
+        text message
+        enum type
+        boolean is_read
         timestamp created_at
     }
 ```

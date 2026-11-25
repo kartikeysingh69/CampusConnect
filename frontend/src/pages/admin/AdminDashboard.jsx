@@ -73,7 +73,8 @@ export default function AdminDashboard() {
 
       const { data } = await importStudentBatch(students);
       setImportResult(data);
-      toast.success(`Import complete! ${data.inserted} added.`);
+      const inserted = data.importedCount ?? data.inserted ?? 0;
+      toast.success(`Import complete! ${inserted} added.`);
     } catch (err) {
       toast.error('Import failed: ' + (err.response?.data?.message || err.message));
     } finally {
@@ -736,7 +737,7 @@ export default function AdminDashboard() {
             </div>
 
             <p style={{ fontSize: '0.86rem', color: '#475569', lineHeight: 1.5, margin: '0 0 0.85rem' }}>
-              Paste comma-separated student rows (<code>name, email, department, cgpa</code>). Each candidate will be assigned an automated account with default temporary password (<code>Student@123</code>).
+              Paste comma-separated student rows (<code>name, email, department, cgpa</code>). Each candidate will be assigned an automated account with default temporary password (<code>student@2026</code>).
             </p>
 
             <textarea
@@ -770,8 +771,8 @@ export default function AdminDashboard() {
                   marginBottom: '1rem'
                 }}
               >
-                <strong>✅ Import Summary:</strong> {importResult.inserted} students registered successfully!
-                {importResult.skipped > 0 && ` (${importResult.skipped} already registered / skipped)`}
+                <strong>✅ Import Summary:</strong> {importResult.importedCount ?? importResult.inserted ?? 0} students registered successfully!
+                {(importResult.skippedCount ?? importResult.skipped ?? 0) > 0 && ` (${importResult.skippedCount ?? importResult.skipped} already registered / skipped)`}
               </div>
             )}
 

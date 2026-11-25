@@ -169,7 +169,7 @@ async function sendOfferLetterEmail(student, job, offerDetails) {
 
           ${offerDetails.offer_letter_url ? `
             <div style="text-align: center; margin: 20px 0;">
-              <a href="${offerDetails.offer_letter_url.startsWith('http') ? offerDetails.offer_letter_url : 'http://localhost:5000' + offerDetails.offer_letter_url}" 
+              <a href="${offerDetails.offer_letter_url.startsWith('http') ? offerDetails.offer_letter_url : (process.env.APP_URL || 'http://localhost') + offerDetails.offer_letter_url}" 
                  style="background: #16a34a; color: #ffffff; padding: 12px 24px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-block;">
                 📥 Download Formal Offer Letter PDF
               </a>

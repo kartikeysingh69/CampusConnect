@@ -6,7 +6,8 @@ import {
   bulkUpdateApplicationStatus,
   scheduleInterview,
   issueOfferLetter,
-  getApplicationInterviews
+  getApplicationInterviews,
+  resolveAssetUrl
 } from '../../services/api';
 import CompanyLogo from '../../components/CompanyLogo';
 import toast from 'react-hot-toast';
@@ -173,11 +174,7 @@ export default function ReviewApplications() {
     fetchApps();
   }, []);
 
-  const getResumeUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    return `http://localhost:5000${url}`;
-  };
+  const getResumeUrl = (url) => resolveAssetUrl(url);
 
   // Distinct Filter Options
   const companiesList = useMemo(() => {
@@ -1554,7 +1551,7 @@ export default function ReviewApplications() {
                   Offer Letter PDF Link or Cloud URL
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   value={offerForm.offer_letter_url}
                   onChange={(e) => setOfferForm({ ...offerForm, offer_letter_url: e.target.value })}
                   placeholder="https://drive.google.com/file/... or /uploads/offer-letter.pdf"

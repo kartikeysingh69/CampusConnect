@@ -25,13 +25,13 @@ if ! command -v docker &> /dev/null; then
 fi
 
 echo -e "${YELLOW}[1/2] Building Backend Multi-Stage Container (node:22-alpine)...${NC}"
-docker build -t campusconnect-backend:latest -f backend/Dockerfile .
+docker build -t campusconnect-backend:latest -t miniproject-backend:latest -f backend/Dockerfile .
 
 echo -e "${YELLOW}[2/2] Building Frontend Multi-Stage Container (nginx:alpine)...${NC}"
-docker build -t campusconnect-frontend:latest -f frontend/Dockerfile .
+docker build -t campusconnect-frontend:latest -t miniproject-frontend:latest -f frontend/Dockerfile .
 
 echo -e "\n${GREEN}====================================================${NC}"
 echo -e "${GREEN}🎉 Docker Images Built Successfully!${NC}"
 echo -e "${GREEN}Image Size Comparison:${NC}"
-docker images | grep campusconnect || true
+docker images | grep -E "campusconnect|miniproject" || true
 echo -e "${GREEN}====================================================${NC}"

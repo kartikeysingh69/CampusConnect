@@ -101,20 +101,30 @@ router.post('/post-drive', verifyToken, requireRecruiterOrAdmin, async (req, res
       `INSERT INTO jobs 
        (title, company, description, location, ctc, deadline, eligibility, stream, job_type, status) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'open')`,
-      [title, company, description, location, ctc, deadline, eligibility, stream, job_type]
+      [
+        title,
+        company,
+        description || null,
+        location || null,
+        ctc || null,
+        deadline || null,
+        eligibility || null,
+        stream,
+        job_type
+      ]
     );
 
     // Broadcast notification to all students
     try {
       const [students] = await db.query("SELECT id FROM users WHERE role = 'student'");
       for (const st of students) {
-        await sendNotification(
-          st.id,
-          `New Corporate Drive: ${title} at ${company}`,
-          `${company} has opened a new campus hiring drive for ${title} (${ctc || 'Attractive Package'}). Review eligibility and apply!`,
-          'drive',
-          `/jobs/${result.insertId}`
-        );
+        await sendNotification({
+          userId: st.id,
+          title: `New Corporate Drive: ${title} at ${company}`,
+          message: `${company} has opened a new campus hiring drive for ${title} (${ctc || 'Attractive Package'}). Review eligibility and apply!`,
+          type: 'drive',
+          link: `/jobs/${result.insertId}`
+        });
       }
     } catch (e) {
       console.warn('Student notification error:', e.message);

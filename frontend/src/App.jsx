@@ -92,7 +92,7 @@ function AppRoutes() {
       <Route
         path="/recruiter"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRoles={['recruiter', 'admin']}>
             <RecruiterDashboard />
           </ProtectedRoute>
         }

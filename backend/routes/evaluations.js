@@ -66,13 +66,13 @@ router.post('/', verifyToken, requireRecruiterOrAdmin, async (req, res) => {
     if (appRows.length > 0) {
       const app = appRows[0];
       const recLabel = recommendation === 'hire' ? 'Positive (Recommended for Selection)' : recommendation === 'hold' ? 'On Reserve / Under Review' : 'Interview Feedback Logged';
-      await sendNotification(
-        app.student_id,
-        'Recruiter Assessment Feedback Received',
-        `Recruiter feedback has been recorded for your application to ${app.title} at ${app.company}. Assessment Status: ${recLabel}.`,
-        'application',
-        '/my-applications'
-      );
+      await sendNotification({
+        userId: app.student_id,
+        title: 'Recruiter Assessment Feedback Received',
+        message: `Recruiter feedback has been recorded for your application to ${app.title} at ${app.company}. Assessment Status: ${recLabel}.`,
+        type: 'application',
+        link: '/my-applications'
+      });
     }
 
     res.json({

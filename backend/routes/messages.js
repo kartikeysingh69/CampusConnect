@@ -22,13 +22,13 @@ router.post('/', verifyToken, async (req, res) => {
 
     // Send in-app notification to receiver
     try {
-      await sendNotification(
-        receiver_id,
-        `💬 New Message from ${req.user.name}`,
-        message.slice(0, 100) + (message.length > 100 ? '...' : ''),
-        'message',
-        '/messages'
-      );
+      await sendNotification({
+        userId: receiver_id,
+        title: `💬 New Message from ${req.user.name}`,
+        message: message.slice(0, 100) + (message.length > 100 ? '...' : ''),
+        type: 'message',
+        link: '/messages'
+      });
     } catch (notifErr) {
       // Non-blocking notification fail
     }
