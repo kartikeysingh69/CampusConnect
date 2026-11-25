@@ -18,6 +18,7 @@
 | **Phase 1** | **Foundations** | Linux, Bash Automation, Git, MySQL 10-table Schema | [Phase 1 Guide](docs/PHASE_1_LINUX_GIT.md) |
 | **Phase 2** | **Containerization** | Docker, Multi-Stage Builds, Docker Compose, Volumes, Networks | [Phase 2 Guide](docs/PHASE_2_DOCKER.md) |
 | **Phase 3** | **CI/CD Automation** | GitHub Actions, Unit Testing (`node:test`), GHCR Container Registry | [Phase 3 Guide](docs/PHASE_3_CICD.md) |
+| **Phase 4** | **Cloud Computing** | AWS EC2 (t3.micro), VPC, Security Groups, S3 Encrypted Storage, IAM | [Phase 4 Guide](docs/PHASE_4_CLOUD_COMPUTING.md) |
 
 ---
 

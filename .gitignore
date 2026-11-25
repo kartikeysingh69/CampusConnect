@@ -18,6 +18,13 @@ build/
 .env.production.local
 backend/.env
 backend/.env.production
+*.pem
+*.key
+infra/keys/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+.terraform.lock.hcl
 
 # Logs & Runtime Dumps
 *.log
