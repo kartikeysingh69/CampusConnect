@@ -1,0 +1,43 @@
+# ==============================================================================
+# monitoring/prometheus/prometheus.yml — Prometheus Scrape & Alert Configuration
+# ==============================================================================
+
+global:
+  scrape_interval: 15s     # Pull metrics from targets every 15 seconds
+  evaluation_interval: 15s # Evaluate alert rules every 15 seconds
+
+# Alertmanager connection
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Alerting rules files
+rule_files:
+  - /etc/prometheus/alert_rules.yml
+
+# Targets to scrape
+scrape_configs:
+  # 1. Monitor Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 2. CampusConnect Node.js Express Backend API (/metrics)
+  - job_name: 'campusconnect-backend'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['backend:5000']
+        labels:
+          service: 'campusconnect-api'
+          environment: 'production'
+
+  # 3. Host / Docker VM OS Metrics (CPU, RAM, Disk, Network)
+  - job_name: 'node-exporter'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          instance_name: 'campusconnect-host'

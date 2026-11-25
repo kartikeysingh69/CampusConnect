@@ -1,0 +1,16 @@
+# ==============================================================================
+# monitoring/grafana/provisioning/dashboards/dashboard.yml
+# Automatically loads pre-built CampusConnect Grafana dashboards on boot.
+# ==============================================================================
+
+apiVersion: 1
+
+providers:
+  - name: 'CampusConnect Observability'
+    orgId: 1
+    folder: 'CampusConnect'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/dashboards

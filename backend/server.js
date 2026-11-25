@@ -7,6 +7,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 const db = require('./config/db');
+const { metricsMiddleware, metricsHandler } = require('./middleware/metrics');
 
 // .env file se secrets load karo (jaise DB password, JWT key)
 dotenv.config();
@@ -24,6 +25,7 @@ if (!fs.existsSync(resumesDir)) fs.mkdirSync(resumesDir, { recursive: true });
 app.use(cors());                     // Frontend (React) ko API access deta hai
 app.use(express.json());             // JSON body parse karne ke liye
 app.use(express.urlencoded({ extended: true })); // Form data ke liye
+app.use(metricsMiddleware);          // Prometheus HTTP throughput & latency metrics
 
 // Static folder for uploaded files (100% Free Local Storage)
 app.use('/uploads', express.static(uploadsDir));
@@ -58,6 +60,9 @@ app.use('/api/assistant', assistantRoutes);   // /api/assistant (CampusBot AI Co
 app.use('/api/assessment', assessmentRoutes); // /api/assessment (In-browser coding test)
 app.use('/api/messages', messageRoutes);       // /api/messages (1-on-1 direct chat)
 app.use('/api/admin', adminBatchRoutes);      // /api/admin/import-students (batch CSV importer)
+
+// ---- Prometheus Metrics Scrape Endpoint ----
+app.get('/metrics', metricsHandler);
 
 // ---- Health Check Route (Test karne ke liye) ----
 app.get('/', (req, res) => {

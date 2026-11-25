@@ -21,6 +21,7 @@
 | **Phase 4** | **Cloud Computing** | AWS EC2 (t3.micro), VPC, Security Groups, S3 Encrypted Storage, IAM | [Phase 4 Guide](docs/PHASE_4_CLOUD_COMPUTING.md) |
 | **Phase 5** | **Infrastructure as Code** | Terraform HCL, State Management (`terraform.tfstate`), `plan`/`apply`/`destroy` | [Phase 5 Guide](docs/PHASE_5_TERRAFORM.md) |
 | **Phase 6** | **Container Orchestration** | Kubernetes (Minikube), Deployments, `ClusterIP`/`NodePort`/`LoadBalancer`, HPA | [Phase 6 Guide](docs/PHASE_6_KUBERNETES.md) |
+| **Phase 7** | **Monitoring & Alerting** | Prometheus (`prom-client`), Node Exporter, Grafana Dashboards, Alertmanager | [Phase 7 Guide](docs/PHASE_7_MONITORING.md) |
 
 ---
 

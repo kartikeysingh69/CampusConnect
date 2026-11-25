@@ -1,0 +1,67 @@
+# ==============================================================================
+# monitoring/prometheus/alert_rules.yml — Production Alerting Rules
+# Transitions: Inactive -> Pending -> Firing -> Alertmanager (Slack / Email)
+# ==============================================================================
+
+groups:
+  - name: campusconnect_availability_alerts
+    rules:
+      # 1. Critical Alert: Backend Server Down
+      - alert: CampusConnectBackendDown
+        expr: up{job="campusconnect-backend"} == 0
+        for: 15s
+        labels:
+          severity: critical
+          team: devops
+        annotations:
+          summary: "CRITICAL: CampusConnect Backend Server is DOWN!"
+          description: "Prometheus failed to scrape {{ $labels.instance }} for more than 15 seconds. Immediate investigation required."
+
+      # 2. Warning Alert: High Server CPU Utilization (> 80%)
+      - alert: HighHostCPUUsage
+        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100)) > 80
+        for: 1m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "High CPU usage detected on {{ $labels.instance }}"
+          description: "CPU utilization has exceeded 80% for 1 minute (current: {{ printf \"%.1f\" $value }}%)."
+
+      # 3. Warning Alert: High Host RAM Usage (> 85%)
+      - alert: HighHostMemoryUsage
+        expr: ((node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100) > 85
+        for: 1m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "High Memory utilization on {{ $labels.instance }}"
+          description: "RAM consumption is above 85% (current: {{ printf \"%.1f\" $value }}%)."
+
+      # 4. Warning Alert: Slow Backend API Latency (P95 > 1 second)
+      - alert: HighAPILatencyP95
+        expr: histogram_quantile(0.95, sum(rate(campusconnect_http_request_duration_seconds_bucket[5m])) by (le, route)) > 1.0
+        for: 1m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "Slow API response detected on route {{ $labels.route }}"
+          description: "95th percentile latency exceeded 1.0s over the last 5 minutes."
+
+      # 5. Critical Alert: High 5xx Error Rate (> 5%)
+      - alert: HighHTTP5xxErrorRate
+        expr: |
+          (
+            sum(rate(campusconnect_http_requests_total{status_code=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(campusconnect_http_requests_total[5m])), 1)
+          ) * 100 > 5
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "High HTTP 5xx server error rate (> 5%)"
+          description: "More than 5% of API requests are failing with HTTP 5xx errors."
